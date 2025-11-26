@@ -87,10 +87,45 @@ public class ConsoleMenu {
         IO.println("------------------------------------------");
         IO.println("ID  | TASK NAME        | STATUS   ");
         IO.println("------------------------------------------");
-        for (Task task : tasks) IO.println("%s | %s | %s".formatted(task.ID, task.Name, task.Status));
+        for (Task task : tasks) {
+        IO.println("%s  | %s               | %s".formatted(task.ID, task.Name, task.Status));
         }
         IO.println("------------------------------------------");
-        return 0;
+        double completionRate = 0;
+        for (Task task : tasks) {
+            if (task.Status == Status.COMPLETED) {
+                completionRate += 1;
+            }
+        }
+        completionRate /= tasks.length;
+        IO.println("Completion Rate: " + (completionRate * 100) + "%");
+        IO.println("Options:");
+        IO.println("1. Add New Task");
+        IO.println("2. Update Tasks Status");
+        IO.println("3. Remove Task");
+        IO.println("4. Back to Main Menu");
+        return getChoice(4);
+    }
+    public Task addTask() {
+        IO.println("Enter task name:");
+        String name = IO.readln();
+        IO.println("Enter assign project ID:");
+        String projectID = IO.readln();
+        IO.println("Enter initial status (Pending/In Progress/Completed):");
+        String rawStatus = IO.readln();
+        Task.STATUS status;
+        switch (rawStatus.toLowerCase()) {
+            case "completed":
+                status = Task.STATUS.COMPLETED;
+                break;
+            case "in progress":
+                status = Task.STATUS.IN_PROGRESS;
+                break;
+            case "pending":
+                status = Task.STATUS.PENDING;
+                break;
+        }
+        return new Task();
     }
     public void ManageTasks() {
 

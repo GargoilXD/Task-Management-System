@@ -62,6 +62,8 @@ void program() {
                             Task[] tasks = projectService.filterTasksByProjectID();
                             switch (consoleMenu.viewProjectDetails(project, tasks)) {
                                 case 1:
+                                    Task newTask = consoleMenu.addTask();
+
                                     break;
                                 case 2:
                                     break;
