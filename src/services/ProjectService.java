@@ -3,21 +3,17 @@ package services;
 import models.HardwareProject;
 import models.Project;
 import models.SoftwareProject;
+import models.Task;
 import utils.OperationResult;
 
 public class ProjectService {
-    /*private static ProjectService projectService;
-    private ProjectService() {}
-    public static ProjectService getInstance() {
-        if (projectService == null) {
-            projectService = new ProjectService();
-        }
-        return projectService;
-    }*/
-    static final int MAX_PROJECT_COUNT = 100;
+    static final int MAX_PROJECT_COUNT = 10;
     public Project[] Projects =  new Project[MAX_PROJECT_COUNT];
     public int projectCount = 0;
-
+    TaskService taskService;
+    public ProjectService(TaskService taskService) {
+        this.taskService = taskService;
+    }
     public Project findProject(String projectID) {
         for (int i = 0; i < projectCount; i++) {
             if (Projects[i].ID.equals(projectID)) {
@@ -37,41 +33,65 @@ public class ProjectService {
         projectCount++;
         return new OperationResult(OperationResult.STATUS.SUCCESS);
     }
+    public void addTaskToProject(Task task) {
+        Project project = findProject(task.ProjectID);
+        if (project == null) {
+            return;
+        }
+        task.ID = String.format("T00%s", project.LastTaskID);
+        project.LastTaskID++;
+        taskService.addTask(task);
+    }
+    public void updateTaskStatus(Task task) {
+        Project project = findProject(task.ProjectID);
+        if (project == null) {
+            return;
+        }
+        taskService.
+    }
+    public void deleteTaskFromProject(String projectID, String taskID) {
+
+    }
+    public Task[] filterTasksByProjectID(String projectID) {
+        return taskService.filterTasksByProjectID(projectID);
+    }
     public enum FILTER {
         ALL,
         SOFTWARE,
         HARDWARE
     }
-    public String printProjects(FILTER filter) {
-        StringBuilder output = new StringBuilder();
+    public void printProjects(FILTER filter) {
+        IO.println("-".repeat(20));
+        IO.println("ID | PROJECT NAME          | TYPE      | TEAM SIZE | BUDGET");
+        IO.println("-".repeat(20));
         for (int i = 0; i < projectCount; i++) {
             switch (filter) {
                 case ALL:
-                    output.append(Projects[i]);
+                    IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, Projects[i] instanceof SoftwareProject? "Software" : "Hardware", Projects[i].TeamSize, Projects[i].Budget));
+                    IO.println("-".repeat(20));
                     break;
                 case SOFTWARE:
                     if (Projects[i] instanceof SoftwareProject) {
-                        output.append(Projects[i]);
+                        IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, "Software", Projects[i].TeamSize, Projects[i].Budget));
                     }
                     break;
                 case HARDWARE:
                     if (Projects[i] instanceof HardwareProject) {
-                        output.append(Projects[i]);
+                        IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, "Hardware", Projects[i].TeamSize, Projects[i].Budget));
                     }
                     break;
             }
-
         }
-        return output.toString();
     }
     public String printProjectsByBudget(double min, double max) {
         StringBuilder output = new StringBuilder();
         for (int i = 0; i < projectCount; i++) {
-            if (Projects[i].budget >= min && Projects[i].budget <= max) {
+            if (Projects[i].Budget >= min && Projects[i].Budget <= max) {
                 output.append(Projects[i]);
             }
             break;
         }
         return output.toString();
     }
+
 }

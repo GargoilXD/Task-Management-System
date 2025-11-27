@@ -5,9 +5,9 @@ import models.Task;
 import utils.OperationResult;
 
 public class TaskService {
-    static final int MAX_TASK_COUNT = 100;
+    static final int MAX_TASK_COUNT = 50;
     public Task[] Tasks =  new Task[MAX_TASK_COUNT];
-    public int taskCount = 0;
+    public int TaskIndex = 0;
     public Task[] filterTasksByProjectID(String projectID) {
         int count = 0;
         for (int i = 0; i < taskCount; i++) {
@@ -24,9 +24,9 @@ public class TaskService {
         return filteredTasks;
     }
     Task findTask(String taskID) {
-        for (Task t : Tasks) {
-            if (t.ID.equals(taskID)) {
-                return t;
+        for (int i = 0; i < taskCount; i++) {
+            if (Tasks[i].ID.equals(taskID) && !Tasks[i].deleted) {
+                return Tasks[i];
             }
         }
         return null;
@@ -38,14 +38,17 @@ public class TaskService {
         if (findTask(task.ID) != null) {
             return new OperationResult(OperationResult.STATUS.FAILURE, "Task ID already exists");
         }
+
         Tasks[taskCount] = task;
         taskCount++;
         return new OperationResult(OperationResult.STATUS.SUCCESS);
     }
-    public OperationResult deleteTask(Task task) {
-        if (findTask(task.ID) == null) {
+    public OperationResult deleteTask(String taskID) {
+        Task task = findTask(taskID);
+        if (task == null) {
             return new OperationResult(OperationResult.STATUS.FAILURE, "Task doesn't exists");
         }
+        task.deleted = true;
         return new OperationResult(OperationResult.STATUS.SUCCESS);
     }
     public OperationResult updateTask(String taskID, String taskName, Task.STATUS taskStatus) {
@@ -54,14 +57,7 @@ public class TaskService {
             return new OperationResult(OperationResult.STATUS.FAILURE, "Task doesn't exists");
         }
         found.Name = taskName;
-        found.Status = taskStatus;
+        found. = taskStatus;
         return new OperationResult(OperationResult.STATUS.SUCCESS);
-    }
-    public String viewTasks() {
-        StringBuilder tasks = new StringBuilder();
-        for (Task task : Tasks) {
-            tasks.append(task.toString()).append("\n");
-        }
-        return tasks.toString();
     }
 }
