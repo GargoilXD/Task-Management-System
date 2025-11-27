@@ -26,7 +26,7 @@ void initialization() {
 }
 
 void program() {
-    User current_user = new AdminUser("Kobby", "12345");
+    User current_user = new AdminUser("Kobby", "12345"); 
     /*if (current_user == null) {
         IO.println("Login Failed. Please try again later.");
         System.exit(0);
