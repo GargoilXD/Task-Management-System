@@ -1,11 +1,8 @@
 package utils;
 
 import models.*;
-import services.ProjectService;
-import services.TaskService;
-
-import java.util.Scanner;
-
+import java.util.function.Supplier;
+/*
 public class ConsoleMenu {
     public Scanner scanner;
     ProjectService projectService;
@@ -13,17 +10,7 @@ public class ConsoleMenu {
         this.projectService = projectService;
         this.scanner = new Scanner(System.in);
     }
-    int getChoice(int range) {
-        while (true) {
-            IO.println("Enter your choice:");
-            int choice = scanner.nextInt();
-            if (choice <= 0 || choice > range) {
-                IO.println("Invalid choice.");
-            } else {
-                return choice;
-            }
-        }
-    }
+
     public User Login(User[] users) {
         String username;
         String password;
@@ -179,4 +166,23 @@ public class ConsoleMenu {
     public void SwitchUser() {
 
     }
+}*/
+
+public abstract class ConsoleMenu {
+    String name;
+    String title;
+    Supplier<String> information;
+
+    public ConsoleMenu(String name, String title, Supplier<String> information) {
+        this.name = name;
+        this.title = title;
+        this.information = information;
+    }
+    public ConsoleMenu(String name, String title) {
+        this.name = name;
+        this.title = title;
+        this.information = () -> "";
+    }
+    public void display() {}
 }
+

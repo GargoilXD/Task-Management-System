@@ -3,15 +3,15 @@ package models;
 import interfaces.Completable;
 
 public class Task implements Completable {
-    public String ProjectID;
+    public String projectID;
     public String ID;
-    public String Name;
-    public STATUS Status;
+    public String name;
+    public STATUS status;
     public boolean deleted = false;
-    public Task(String ProjectID, String ID, String Name, STATUS Status) {
+    public Task(String projectID, String ID, String name, STATUS status) {
         this.ID = ID;
-        this.ProjectID = ProjectID;
-        this.Name = Name;
-        this.Status = Status;
+        this.projectID = projectID;
+        this.name = name;
+        this.status = status;
     }
 }

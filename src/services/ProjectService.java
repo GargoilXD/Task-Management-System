@@ -4,94 +4,64 @@ import models.HardwareProject;
 import models.Project;
 import models.SoftwareProject;
 import models.Task;
-import utils.OperationResult;
 
 public class ProjectService {
     static final int MAX_PROJECT_COUNT = 10;
-    public Project[] Projects =  new Project[MAX_PROJECT_COUNT];
-    public int projectCount = 0;
-    TaskService taskService;
-    public ProjectService(TaskService taskService) {
-        this.taskService = taskService;
-    }
+    Project[] projects = new Project[MAX_PROJECT_COUNT];
+    int projectIndex = 0;
+
     public Project findProject(String projectID) {
-        for (int i = 0; i < projectCount; i++) {
-            if (Projects[i].ID.equals(projectID)) {
-                return Projects[i];
+        for (int index = 0; index < projectIndex; index++) {
+            if (projects[index].ID.equals(projectID)) {
+                return projects[index];
             }
         }
         return null;
     }
-    public OperationResult createProject(Project project) {
-        if (projectCount == MAX_PROJECT_COUNT) {
-            return new OperationResult(OperationResult.STATUS.FAILURE, "Project limit reached");
-        }
-        if (findProject(project.ID) != null) {
-            return new OperationResult(OperationResult.STATUS.FAILURE, "Project ID already exists");
-        }
-        Projects[projectCount] = project;
-        projectCount++;
-        return new OperationResult(OperationResult.STATUS.SUCCESS);
+    public void createProject(Project project) {
+        if (projectIndex >= MAX_PROJECT_COUNT || findProject(project.ID) != null) return;
+        projects[projectIndex] = project;
+        projectIndex++;
     }
-    public void addTaskToProject(Task task) {
-        Project project = findProject(task.ProjectID);
-        if (project == null) {
-            return;
-        }
-        task.ID = String.format("T00%s", project.LastTaskID);
-        project.LastTaskID++;
-        taskService.addTask(task);
-    }
-    public void updateTaskStatus(Task task) {
-        Project project = findProject(task.ProjectID);
-        if (project == null) {
-            return;
-        }
-        taskService.
-    }
-    public void deleteTaskFromProject(String projectID, String taskID) {
-
-    }
-    public Task[] filterTasksByProjectID(String projectID) {
-        return taskService.filterTasksByProjectID(projectID);
-    }
-    public enum FILTER {
-        ALL,
-        SOFTWARE,
-        HARDWARE
-    }
-    public void printProjects(FILTER filter) {
-        IO.println("-".repeat(20));
-        IO.println("ID | PROJECT NAME          | TYPE      | TEAM SIZE | BUDGET");
-        IO.println("-".repeat(20));
-        for (int i = 0; i < projectCount; i++) {
+    public enum FILTER { ALL, SOFTWARE, HARDWARE, BUDGET }
+    public Project[] filterProjects(FILTER filter) {
+        Project[] filteredProjects = new Project[projectIndex];
+        int filteredProjectsIndex = 0;
+        for (int index = 0; index < projectIndex; index++) {
             switch (filter) {
                 case ALL:
-                    IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, Projects[i] instanceof SoftwareProject? "Software" : "Hardware", Projects[i].TeamSize, Projects[i].Budget));
-                    IO.println("-".repeat(20));
+                    filteredProjects[filteredProjectsIndex] = projects[index];
+                    filteredProjectsIndex++;
                     break;
                 case SOFTWARE:
-                    if (Projects[i] instanceof SoftwareProject) {
-                        IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, "Software", Projects[i].TeamSize, Projects[i].Budget));
+                    if (projects[index] instanceof SoftwareProject) {
+                        filteredProjects[filteredProjectsIndex] = projects[index];
+                        filteredProjectsIndex++;
                     }
                     break;
                 case HARDWARE:
-                    if (Projects[i] instanceof HardwareProject) {
-                        IO.println(String.format("%s | %s | %s | %s | %s", Projects[i].ID, Projects[i].Name, "Hardware", Projects[i].TeamSize, Projects[i].Budget));
+                    if (projects[index] instanceof HardwareProject) {
+                        filteredProjects[filteredProjectsIndex] = projects[index];
+                        filteredProjectsIndex++;
                     }
                     break;
             }
         }
+        Project[] shrunken = new Project[filteredProjectsIndex];
+        System.arraycopy(filteredProjects, 0, shrunken, 0, filteredProjectsIndex);
+        return shrunken;
     }
-    public String printProjectsByBudget(double min, double max) {
-        StringBuilder output = new StringBuilder();
-        for (int i = 0; i < projectCount; i++) {
-            if (Projects[i].Budget >= min && Projects[i].Budget <= max) {
-                output.append(Projects[i]);
+    public Project[] filterProjects(int min, int max) {
+        Project[] filteredProjects = new Project[projectIndex];
+        int filteredProjectsIndex = 0;
+        for (int index = 0; index < projectIndex; index++) {
+            if (projects[index].Budget >= min && projects[index].Budget <= max) {
+                filteredProjects[filteredProjectsIndex] = projects[index];
+                filteredProjectsIndex++;
             }
-            break;
         }
-        return output.toString();
+        Project[] shrunken = new Project[filteredProjectsIndex];
+        System.arraycopy(filteredProjects, 0, shrunken, 0, filteredProjectsIndex);
+        return shrunken;
     }
-
 }
