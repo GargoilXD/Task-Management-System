@@ -3,7 +3,6 @@ package services;
 import models.HardwareProject;
 import models.Project;
 import models.SoftwareProject;
-import models.Task;
 
 public class ProjectService {
     static final int MAX_PROJECT_COUNT = 10;
@@ -12,16 +11,51 @@ public class ProjectService {
 
     public Project findProject(String projectID) {
         for (int index = 0; index < projectIndex; index++) {
-            if (projects[index].ID.equals(projectID)) {
+            if (projects[index].ID.equals(projectID) && !projects[index].Deleted) {
                 return projects[index];
             }
         }
         return null;
     }
-    public void createProject(Project project) {
-        if (projectIndex >= MAX_PROJECT_COUNT || findProject(project.ID) != null) return;
-        projects[projectIndex] = project;
-        projectIndex++;
+    Project getDeletedProject() {
+        for (int index = 0; index < projectIndex; index++) {
+            if (projects[index].Deleted) {
+                return projects[index];
+            }
+        }
+        return null;
+    }
+    public Project findProjectByName(String projectName) {
+        for (int index = 0; index < projectIndex; index++) {
+            if (projects[index].Name.equals(projectName) && !projects[index].Deleted) {
+                return projects[index];
+            }
+        }
+        return null;
+    }
+    public boolean createProject(Project project) {
+        if (findProjectByName(project.Name) != null) return false;
+        Project deletedProject = getDeletedProject();
+        if (deletedProject == null) {
+            if (projectIndex >= MAX_PROJECT_COUNT) return false;
+            projects[projectIndex] = project;
+            project.ID = String.format("P%03d", projectIndex + 1);
+            projectIndex++;
+        } else {
+            //deletedProject = project;
+            deletedProject.Name = project.Name;
+            deletedProject.Description = project.Description;
+            deletedProject.TeamSize = project.TeamSize;
+            deletedProject.Budget = project.Budget;
+            deletedProject.Deleted = false;
+        }
+        return true;
+    }
+    public boolean removeProject(String projectID) {
+        Project project = findProject(projectID);
+        if (project == null) return false;
+        project.Deleted = true;
+        return true;
     }
     public enum FILTER { ALL, SOFTWARE, HARDWARE, BUDGET }
     public Project[] filterProjects(FILTER filter) {

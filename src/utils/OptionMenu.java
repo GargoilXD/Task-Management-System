@@ -3,13 +3,16 @@ package utils;
 import java.util.function.Supplier;
 
 public class OptionMenu extends ConsoleMenu {
+    Supplier<String> information;
     String optionsTitle;
     ConsoleMenu[] subMenus;
     String backTitle;
     String choiceMessage;
     Supplier<Integer> Choice;
+
     public OptionMenu(String name, String title, Supplier<String> information, String optionsTitle, ConsoleMenu[] subMenus, String backTitle, String choiceMessage, Supplier<Integer> Choice) {
-        super(name, title, information);
+        super(name, title);
+        this.information = information;
         this.optionsTitle = optionsTitle;
         this.subMenus = subMenus;
         this.backTitle = backTitle;
@@ -18,6 +21,7 @@ public class OptionMenu extends ConsoleMenu {
     }
     public OptionMenu(String name, String title, String optionsTitle, ConsoleMenu[] subMenus, String backTitle, String choiceMessage, Supplier<Integer> Choice) {
         super(name, title);
+        this.information = () -> "";
         this.optionsTitle = optionsTitle;
         this.subMenus = subMenus;
         this.backTitle = backTitle;

@@ -6,8 +6,8 @@ public abstract class Project {
     public String Description;
     public int TeamSize;
     public double Budget;
-    public Project(String ID, String Name, String Description, int TeamSize, double Budget) {
-        this.ID = ID;
+    public boolean Deleted = false;
+    public Project(String Name, String Description, int TeamSize, double Budget) {
         this.Name = Name;
         this.Description = Description;
         this.TeamSize = TeamSize;
