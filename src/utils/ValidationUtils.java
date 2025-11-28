@@ -5,48 +5,60 @@ import java.util.Scanner;
 import interfaces.Completable;
 
 public class ValidationUtils {
-    public static String getValidTaskID() {
+    public static String getValidTaskID(Scanner scanner) {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. T001).
         while (true) {
-            String response = IO.readln().trim();
+            String response = scanner.nextLine().trim();
             if (response.matches("^T\\d{3}$")) {
                 return response;
             } else {
-                IO.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. T001):");
-                IO.println("Enter again:");
+                System.out.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. T001):");
+                System.out.println("Enter again:");
             }
         }
     }
-    public static String getValidProjectID() {
+    public static String getValidProjectID(Scanner scanner) {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001).
         while (true) {
-            String response = IO.readln().trim();
+            String response = scanner.nextLine().trim();
             if (response.matches("^P\\d{3}$")) {
                 return response;
             } else {
-                IO.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001)");
-                IO.println("Enter again:");
+                System.out.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001)");
+                System.out.println("Enter again:");
             }
         }
     }
-    public static String getValidProjectID(String orAccept) {
+    public static String getValidProjectID(Scanner scanner, String orAccept) {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001).
         while (true) {
-            String response = IO.readln().trim();
+            String response = scanner.nextLine().trim();
             if (response.matches("^P\\d{3}$")) {
                 return response;
             } else if (response.equals(orAccept)) {
                 return response;
             } else {
-                IO.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001)");
-                IO.println("Enter again:");
+                System.out.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001)");
+                System.out.println("Enter again:");
             }
         }
     }
-    public static Completable.STATUS getValidTaskStatus() {
+    public static String getValidUserID(Scanner scanner) {
+        // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. U001).
+        while (true) {
+            String response = scanner.nextLine().trim();
+            if (response.matches("^U\\d{3}$")) {
+                return response;
+            } else {
+                System.out.println("Invalid input. Please enter a valid numeric or prefixed ID (e.g. U001)");
+                System.out.println("Enter again:");
+            }
+        }
+    }
+    public static Completable.STATUS getValidTaskStatus(Scanner scanner) {
         // Error: Invalid status. Please choose from [Pending, In Progress, Completed].
         while (true) {
-            String response = IO.readln().trim();
+            String response = scanner.nextLine().trim();
             if (response.matches("^\\s*(Pending|In Progress|Completed)\\s*$")) {
                 switch (response.toLowerCase()) {
                     case "pending": return Completable.STATUS.PENDING;
@@ -54,23 +66,23 @@ public class ValidationUtils {
                     case "completed": return Completable.STATUS.COMPLETED;
                 }
             } else {
-                IO.println("Invalid status. Please choose from [Pending, In Progress, Completed].");
-                IO.println("Enter again:");
+                System.out.println("Invalid status. Please choose from [Pending, In Progress, Completed].");
+                System.out.println("Enter again:");
             }
         }
     }
-    public static boolean getValidProjectType() {
+    public static boolean getValidProjectType(Scanner scanner) {
         // Error: Invalid type. Please choose from [Software, Hardware].
         while (true) {
-            String response = IO.readln().trim();
+            String response = scanner.nextLine().trim();
             if (response.matches("^\\s*(Software|Hardware)\\s*$")) {
                 switch (response.toLowerCase()) {
                     case "software": return true;
                     case "hardware": return false;
                 }
             } else {
-                IO.println("Invalid type. Please choose from [Software, Hardware].");
-                IO.println("Enter again:");
+                System.out.println("Invalid type. Please choose from [Software, Hardware].");
+                System.out.println("Enter again:");
             }
         }
     }
@@ -85,8 +97,8 @@ public class ValidationUtils {
                     throw new Exception();
                 }
             } catch (Exception e) {
-                IO.println("Expected number");
-                IO.println("Enter again:");
+                System.out.println("Expected number");
+                System.out.println("Enter again:");
                 scanner.nextLine();
             }
 

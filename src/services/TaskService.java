@@ -8,6 +8,19 @@ public class TaskService {
     public Task[] tasks = new Task[MAX_TASK_COUNT];
     public int taskIndex = 0;
 
+    public Task[] getTasks() {
+        Task[] Tasks = new Task[taskIndex];
+        int TasksIndex = 0;
+        for (int index = 0; index < taskIndex; index++) {
+            if (!tasks[index].deleted) {
+                Tasks[TasksIndex] = tasks[index];
+                TasksIndex++;
+            }
+        }
+        Task[] shrunken = new Task[TasksIndex];
+        System.arraycopy(Tasks, 0, shrunken, 0, TasksIndex);
+        return shrunken;
+    }
     public Task findTask(String projectID, String taskID) {
         for (int index = 0; index < taskIndex; index++) {
             if (tasks[index].ID.equals(taskID) && tasks[index].projectID.equals(projectID) && !tasks[index].deleted) {
@@ -24,7 +37,14 @@ public class TaskService {
         }
         return null;
     }
-
+    public Task findTaskByID(String ID) {
+        for (int index = 0; index < taskIndex; index++) {
+            if (tasks[index].ID.equals(ID) && !tasks[index].deleted) {
+                return tasks[index];
+            }
+        }
+        return null;
+    }
     public Task[] getProjectTasks(String projectID) {
         Task[] projectTasks = new Task[taskIndex];
         int projectTasksIndex = 0;
@@ -38,7 +58,6 @@ public class TaskService {
         System.arraycopy(projectTasks, 0, shrunken, 0, projectTasksIndex);
         return shrunken;
     }
-
     Task getDeletedTask() {
         for (int index = 0; index < taskIndex; index++) {
             if (tasks[index].deleted) {
@@ -47,7 +66,6 @@ public class TaskService {
         }
         return null;
     }
-
     public boolean addTask(String projectID, String name, Completable.STATUS status) {
         if (findTaskByName(projectID, name) != null) return false;
         Task task = getDeletedTask();
@@ -64,14 +82,12 @@ public class TaskService {
         }
         return true;
     }
-
     public boolean removeTask(String projectID, String taskID) {
         Task task = findTask(projectID, taskID);
         if (task == null) return false;
         task.deleted = true;
         return true;
     }
-
     public boolean updateTask(String projectID, String taskID, Completable.STATUS status) {
         Task task = findTask(projectID, taskID);
         if (task == null) return false;

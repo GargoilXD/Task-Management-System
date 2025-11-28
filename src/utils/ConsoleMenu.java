@@ -1,8 +1,8 @@
 package utils;
 
 public abstract class ConsoleMenu {
-    String name;
-    String title;
+    public String name;
+    public String title;
 
     public ConsoleMenu(String name, String title) {
         this.name = name;

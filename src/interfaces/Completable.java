@@ -6,5 +6,4 @@ public interface Completable {
         IN_PROGRESS,
         COMPLETED
     }
-    STATUS status = STATUS.PENDING;
 }

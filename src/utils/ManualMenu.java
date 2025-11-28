@@ -9,6 +9,7 @@ public class ManualMenu extends ConsoleMenu {
 
     @Override
     public void display() {
+        System.out.println(this.title);
         getInput.run();
     }
 }
