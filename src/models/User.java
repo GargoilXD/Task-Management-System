@@ -1,10 +1,12 @@
 package models;
 
+// This is the User Class
 public abstract class User {
     public String ID;
     public String name;
     public String password;
     public String email;
+    // Static variable that all objects share. For keeping track of user IDs
     static int LastID;
 
     public User(String name, String password) {

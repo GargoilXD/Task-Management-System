@@ -2,6 +2,8 @@ package utils;
 
 import java.util.Scanner;
 
+// This class Inherits from the ConsoleMenu Class.
+// It displays menu options for the user to choose from
 public class OptionMenu extends ConsoleMenu {
     String optionsTitle;
     ConsoleMenu[] subMenus;
@@ -17,6 +19,21 @@ public class OptionMenu extends ConsoleMenu {
         this.choiceMessage = choiceMessage;
         this.scanner = scanner;
     }
+    // This Displays the Menu
+    /* Example:
+        =====================================
+                       TITLE
+        =====================================
+
+        Options Title
+        ---------
+        1. Manage Projects
+        2. Manage Tasks
+        3. View Status Reports
+        4. Switch User
+        5. Exit
+        choiceMessage:
+    */
     @Override
     public void display() {
         System.out.println(title);
@@ -35,6 +52,7 @@ public class OptionMenu extends ConsoleMenu {
             }
         }
     }
+    // The function repeatedly prompts the user until they give a valid choice
     int getChoice(int range) {
         while (true) {
             System.out.println(choiceMessage);

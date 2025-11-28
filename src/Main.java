@@ -9,19 +9,22 @@ import utils.OptionMenu;
 import utils.ValidationUtils;
 
 import java.util.Scanner;
-import java.util.function.Consumer;
 
 public class Main {
+    // Services
     static UserService userService = new UserService();
     static TaskService taskService = new TaskService();
     static ProjectService projectService = new ProjectService();
     public static void main(String[] args) {
         initialization();
         Scanner scanner = new Scanner(System.in);
+        // Display the LoginMenu
         getLoginMenu(scanner, true).display();
+        // Scanner is closed to free memory. Not sure if that was necessary.
         scanner.close();
     }
 
+    // Initialization by creating sample values
     static void initialization() {
         userService.addUser(new AdminUser("Ama", "12345"));
         RegularUser user = new RegularUser("Kofi", "12345");
@@ -63,6 +66,7 @@ public class Main {
         taskService.addTask("P007", "Battery Integration", Task.STATUS.IN_PROGRESS);
         taskService.addTask("P007", "Safety & Overcharge Protection", Task.STATUS.PENDING);
     }
+    // Display Project Details. Moved to function because it's used multiple times.
     static String displayProjectDetails(Project project, Task[] tasks) {
         StringBuilder builder = new StringBuilder();
         builder.append(
@@ -74,9 +78,7 @@ public class Main {
                                 Budget: %s
                                 """,
                         project.Name,
-                        project instanceof SoftwareProject
-                                ? "Software"
-                                : "Hardware",
+                        project instanceof SoftwareProject? "Software" : "Hardware",
                         project.TeamSize,
                         project.Budget
                 )
@@ -103,6 +105,8 @@ public class Main {
         builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
         return builder.toString();
     }
+    // Now here are the Menu functions that display different menus.
+    // It is designed to be modular
     static ConsoleMenu getLoginMenu(Scanner scanner, boolean main) {
         return new ManualMenu(
                 "Login",
@@ -137,6 +141,7 @@ public class Main {
                 }
         );
     }
+    // Main Menu
     static ConsoleMenu getMainMenu(Scanner scanner) {
         return new OptionMenu(
                 "Main Menu",
@@ -150,6 +155,9 @@ public class Main {
                             
                             Main Menu
                             ---------""", userService.current_user.name, (userService.current_user instanceof AdminUser ? "(Admin)" : "")),
+                // Role based Access
+                // Admins can: ManageProjects, ManageTasks, ViewStatusReports, ManageUsers and SwitchUsers
+                // RegularUsers can: ManageProjects, ManageTasks, ViewStatusReports and SwitchUsers
                 (userService.current_user instanceof AdminUser)?
                         new ConsoleMenu[] {
                             getManageProjectMenu(scanner),
@@ -214,7 +222,6 @@ public class Main {
                             System.out.println("Invalid input. Please try again.");
                         }
                     } while (true);
-                    System.out.println("User created successfully.");
                     userService.addUser(admin.equals("y")? new AdminUser(username, password, email) : new RegularUser(username, password, email));
                 }
         );
@@ -247,6 +254,7 @@ public class Main {
                         }
                         case RegularUser ignored -> tasks = taskService.getTasks();
                         default -> {
+                            // Should be unreachable here.
                             return;
                         }
                     }
@@ -254,6 +262,7 @@ public class Main {
                     System.out.println("-".repeat(80));
                     System.out.println("ID   | TASK NAME                      | STATUS          | ASSIGNED");
                     System.out.println("-".repeat(80));
+                    // Find Tasks for user
                     for (Task task : tasks) {
                         if (task.status != Completable.STATUS.COMPLETED) {
                             boolean userTask = false;
@@ -288,6 +297,7 @@ public class Main {
                         
                         """ + displayProjectDetails(project, tasks),
                 "Options:",
+                // Role based access
                 (userService.current_user instanceof AdminUser)
                         ? new ConsoleMenu[] {
                                 getAddTaskMenu(project.ID, scanner),
@@ -396,34 +406,36 @@ public class Main {
                 }
         );
     }
+    // Note: doesn't return a menu. It's specifically for the getBrowseProjectsMenu ManualMenus
+    static void projectFilterProcess(ProjectService.FILTER filter, Scanner scanner) {
+        Project[] projects;
+        // If the filter is for BUDGET then we ask for the range
+        if (filter == ProjectService.FILTER.BUDGET) {
+            System.out.println("Enter min budget:");
+            int min = (int) ValidationUtils.getValidNumber(scanner, 0);
+            System.out.println("Enter max budget:");
+            int max = (int) ValidationUtils.getValidNumber(scanner, 0);
+            projects = projectService.filterProjects(min, max);
+        } else {
+            projects = projectService.filterProjects(filter);
+        }
+        System.out.println("-".repeat(80));
+        System.out.println("ID   | PROJECT NAME                             | TYPE       | TEAM SIZE | BUDGET");
+        System.out.println("-".repeat(80));
+        for (Project project : projects) {
+            System.out.printf("%s | %-40s | %-10s | %-9s | %s%n", project.ID, project.Name, project instanceof SoftwareProject ? "Software" : "Hardware", project.TeamSize, project.Budget);
+            System.out.printf("     | Description: %s%n", project.Description);
+        }
+        System.out.println("-".repeat(80));
+        System.out.println("Enter project ID to view details (0 to return):");
+        String response = ValidationUtils.getValidProjectID(scanner, "0");
+        if (!response.equals("0")) {
+            Project project = projectService.findProject(response);
+            Task[] tasks = taskService.getProjectTasks(response);
+            getProjectDetailsMenu(project, tasks, scanner).display();
+        }
+    }
     static ConsoleMenu getBrowseProjectsMenu(Scanner scanner) {
-        Consumer<ProjectService.FILTER> filterMenu = (ProjectService.FILTER filter) -> {
-            Project[] projects;
-            if (filter == ProjectService.FILTER.BUDGET) {
-                System.out.println("Enter min budget:");
-                int min = (int) ValidationUtils.getValidNumber(scanner, 0);
-                System.out.println("Enter max budget:");
-                int max = (int) ValidationUtils.getValidNumber(scanner, 0);
-                projects = projectService.filterProjects(min, max);
-            } else {
-                projects = projectService.filterProjects(filter);
-            }
-            System.out.println("-".repeat(80));
-            System.out.println("ID   | PROJECT NAME                             | TYPE       | TEAM SIZE | BUDGET");
-            System.out.println("-".repeat(80));
-            for (Project project : projects) {
-                System.out.printf("%s | %-40s | %-10s | %-9s | %s%n", project.ID, project.Name, project instanceof SoftwareProject ? "Software" : "Hardware", project.TeamSize, project.Budget);
-                System.out.printf("     | Description: %s%n", project.Description);
-            }
-            System.out.println("-".repeat(80));
-            System.out.println("Enter project ID to view details (0 to return):");
-            String response = ValidationUtils.getValidProjectID(scanner, "0");
-            if (!response.equals("0")) {
-                Project project = projectService.findProject(response);
-                Task[] tasks = taskService.getProjectTasks(response);
-                getProjectDetailsMenu(project, tasks, scanner).display();
-            }
-        };
         return new OptionMenu(
                 "Browse Projects",
                 """
@@ -433,10 +445,10 @@ public class Main {
                         """,
                 "Filter Options:",
                 new ConsoleMenu[] {
-                        new ManualMenu("View All Projects", "", () -> filterMenu.accept(ProjectService.FILTER.ALL)),
-                        new ManualMenu("Software Projects Only", "", () -> filterMenu.accept(ProjectService.FILTER.SOFTWARE)),
-                        new ManualMenu("Hardware Projects Only", "", () -> filterMenu.accept(ProjectService.FILTER.HARDWARE)),
-                        new ManualMenu("Search by Budget Range", "", () -> filterMenu.accept(ProjectService.FILTER.BUDGET)),
+                        new ManualMenu("View All Projects", "", () -> projectFilterProcess(ProjectService.FILTER.ALL, scanner)),
+                        new ManualMenu("Software Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.SOFTWARE, scanner)),
+                        new ManualMenu("Hardware Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.HARDWARE, scanner)),
+                        new ManualMenu("Search by Budget Range", "", () -> projectFilterProcess(ProjectService.FILTER.BUDGET, scanner)),
                 },
                 "Back",
                 "Enter filter choice:",
@@ -526,6 +538,7 @@ public class Main {
                         ==============================
                         """,
                 "Options:",
+                // Role based access
                 (userService.current_user instanceof AdminUser)?
                         new ConsoleMenu[]{
                         getViewTasksForProjectMenu(scanner),
@@ -598,6 +611,7 @@ public class Main {
         );
     }
     static ConsoleMenu getSwitchUserMenu(Scanner scanner) {
+        // Login menu reuse
         ConsoleMenu menu = getLoginMenu(scanner, false);
         menu.name = "Switch User";
         menu.title = """

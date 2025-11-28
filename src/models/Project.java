@@ -1,5 +1,6 @@
 package models;
 
+// This is the abstract Project class
 public abstract class Project {
     public String ID;
     public String Name;

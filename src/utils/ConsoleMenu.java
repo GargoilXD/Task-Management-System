@@ -1,5 +1,6 @@
 package utils;
 
+// This is the abstract ConsoleMenu class which is the base class for OptionMenu and ManualMenu
 public abstract class ConsoleMenu {
     public String name;
     public String title;
@@ -8,6 +9,7 @@ public abstract class ConsoleMenu {
         this.name = name;
         this.title = title;
     }
-    public void display() {}
+    // This is the abstract display method used by OptionMenu and ManualMenu
+    public abstract void display();
 }
 

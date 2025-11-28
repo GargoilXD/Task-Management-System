@@ -1,9 +1,9 @@
 package utils;
 
 import java.util.Scanner;
-
 import interfaces.Completable;
 
+// The functions in this class repeatedly prompts the user until they give a valid response
 public class ValidationUtils {
     public static String getValidTaskID(Scanner scanner) {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. T001).
