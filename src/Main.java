@@ -1,6 +1,7 @@
 import interfaces.Completable;
 import models.*;
 import services.ProjectService;
+import services.ReportService;
 import services.TaskService;
 import services.UserService;
 import utils.ConsoleMenu;
@@ -12,59 +13,54 @@ import java.util.Scanner;
 
 public class Main {
     // Services
-    static UserService userService = new UserService();
-    static TaskService taskService = new TaskService();
-    static ProjectService projectService = new ProjectService();
+    // Initialization by creating sample values
+    static UserService userService = new UserService(
+            new User[] {
+                    new AdminUser("Kobby", "12345"),
+                    new AdminUser("Ama", "12345"),
+                    new RegularUser("Kofi", "12345", new String[] {"T001", "T002", "T003"}),
+            });
+    static ProjectService projectService = new ProjectService(
+            new Project[] {
+                    new SoftwareProject("Alpha Tracker", "Task tracking app for startups", 5, 15000),
+                    new HardwareProject("IoT Sensor Kit", "Sensor prototype for smart devices", 3, 1000),
+                    new SoftwareProject("Cloud Backup Tool", "Automated backup solution for SMBs", 4, 12000),
+                    new HardwareProject("Smart Thermostat", "Energy-efficient home climate control", 6, 2500),
+                    new SoftwareProject("HR Onboarding Portal", "Streamlined employee onboarding system", 6, 18000),
+                    new SoftwareProject("EduQuiz Platform", "Interactive quiz app for educators", 4, 9500),
+                    new HardwareProject("Solar-Powered Charger", "Portable charger using renewable energy", 5, 1800),
+            });
+    static TaskService taskService = new TaskService(
+            new Task[] {
+                    new Task("P001", "T001", "Design Database", Task.STATUS.COMPLETED),
+                    new Task("P001", "T002", "Implement API", Task.STATUS.IN_PROGRESS),
+                    new Task("P001", "T003", "Write Unit Tests", Task.STATUS.PENDING),
+                    new Task("P002", "T004", "Gather Materials", Task.STATUS.COMPLETED),
+                    new Task("P002", "T005", "Build prototype", Task.STATUS.IN_PROGRESS),
+                    new Task("P003", "T006", "Define Backup Strategy", Task.STATUS.COMPLETED),
+                    new Task("P003", "T007", "Develop Sync Engine", Task.STATUS.IN_PROGRESS),
+                    new Task("P003", "T008", "Create UI Dashboard", Task.STATUS.PENDING),
+                    new Task("P004", "T009", "Circuit Design", Task.STATUS.COMPLETED),
+                    new Task("P004", "T010", "Firmware Development", Task.STATUS.IN_PROGRESS),
+                    new Task("P004", "T011", "Enclosure Prototyping", Task.STATUS.PENDING),
+                    new Task("P005", "T012", "User Authentication", Task.STATUS.COMPLETED),
+                    new Task("P005", "T013", "Document Upload Module", Task.STATUS.IN_PROGRESS),
+                    new Task("P005", "T014", "Integration with Payroll", Task.STATUS.PENDING),
+                    new Task("P006", "T015", "User Registration Flow", Task.STATUS.COMPLETED),
+                    new Task("P006", "T016", "Quiz Builder UI", Task.STATUS.IN_PROGRESS),
+                    new Task("P006", "T017", "Real-time Grading Engine", Task.STATUS.PENDING),
+                    new Task("P007", "T018", "Solar Panel Sourcing", Task.STATUS.COMPLETED),
+                    new Task("P007", "T019", "Battery Integration", Task.STATUS.COMPLETED),
+                    new Task("P007", "T020", "Safety & Overcharge Protection", Task.STATUS.IN_PROGRESS),
+            });
+    public static ReportService reportService = new ReportService(projectService, taskService);
     public static void main(String[] args) {
-        initialization();
+        reportService.updateReports();
         Scanner scanner = new Scanner(System.in);
         // Display the LoginMenu
         getLoginMenu(scanner, true).display();
         // Scanner is closed to free memory. Not sure if that was necessary.
         scanner.close();
-    }
-
-    // Initialization by creating sample values
-    static void initialization() {
-        userService.addUser(new AdminUser("Ama", "12345"));
-        RegularUser user = new RegularUser("Kofi", "12345");
-        user.assign("T001");
-        user.assign("T002");
-        user.assign("T003");
-        userService.addUser(user);
-        projectService.createProject(new SoftwareProject("Alpha Tracker", "Task tracking app for startups", 5, 15000));
-        taskService.addTask("P001", "Design Database", Task.STATUS.COMPLETED);
-        taskService.addTask("P001", "Implement API", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P001", "Write Unit Tests", Task.STATUS.PENDING);
-
-        projectService.createProject(new HardwareProject("IoT Sensor Kit", "Sensor prototype for smart devices", 3, 1000));
-        taskService.addTask("P002", "Gather Materials", Task.STATUS.COMPLETED);
-        taskService.addTask("P002", "Build prototype", Task.STATUS.IN_PROGRESS);
-
-        projectService.createProject(new SoftwareProject("Cloud Backup Tool", "Automated backup solution for SMBs", 4, 12000));
-        taskService.addTask("P003", "Define Backup Strategy", Task.STATUS.COMPLETED);
-        taskService.addTask("P003", "Develop Sync Engine", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P003", "Create UI Dashboard", Task.STATUS.PENDING);
-
-        projectService.createProject(new HardwareProject("Smart Thermostat", "Energy-efficient home climate control", 6, 2500));
-        taskService.addTask("P004", "Circuit Design", Task.STATUS.COMPLETED);
-        taskService.addTask("P004", "Firmware Development", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P004", "Enclosure Prototyping", Task.STATUS.PENDING);
-
-        projectService.createProject(new SoftwareProject("HR Onboarding Portal", "Streamlined employee onboarding system", 6, 18000));
-        taskService.addTask("P005", "User Authentication", Task.STATUS.COMPLETED);
-        taskService.addTask("P005", "Document Upload Module", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P005", "Integration with Payroll", Task.STATUS.PENDING);
-
-        projectService.createProject(new SoftwareProject("EduQuiz Platform", "Interactive quiz app for educators", 4, 9500));
-        taskService.addTask("P006", "User Registration Flow", Task.STATUS.COMPLETED);
-        taskService.addTask("P006", "Quiz Builder UI", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P006", "Real-time Grading Engine", Task.STATUS.PENDING);
-
-        projectService.createProject(new HardwareProject("Solar-Powered Charger", "Portable charger using renewable energy", 5, 1800));
-        taskService.addTask("P007", "Solar Panel Sourcing", Task.STATUS.COMPLETED);
-        taskService.addTask("P007", "Battery Integration", Task.STATUS.IN_PROGRESS);
-        taskService.addTask("P007", "Safety & Overcharge Protection", Task.STATUS.PENDING);
     }
     // Display Project Details. Moved to function because it's used multiple times.
     static String displayProjectDetails(Project project, Task[] tasks) {
@@ -101,7 +97,7 @@ public class Main {
                 completionRate += 1;
             }
         }
-        completionRate /= tasks.length;
+        completionRate /= tasks.length > 0 ? tasks.length : 1;
         builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
         return builder.toString();
     }
@@ -160,11 +156,11 @@ public class Main {
                 // RegularUsers can: ManageProjects, ManageTasks, ViewStatusReports and SwitchUsers
                 (userService.current_user instanceof AdminUser)?
                         new ConsoleMenu[] {
-                            getManageProjectMenu(scanner),
-                            getManageTaskMenu(scanner),
-                            getViewStatusReportMenu(scanner),
-                            getManageUsersMenu(scanner),
-                            getSwitchUserMenu(scanner),
+                                getManageProjectMenu(scanner),
+                                getManageTaskMenu(scanner),
+                                getViewStatusReportMenu(scanner),
+                                getManageUsersMenu(scanner),
+                                getSwitchUserMenu(scanner),
                         }:
                         new ConsoleMenu[] {
                                 getManageProjectMenu(scanner),
@@ -235,6 +231,17 @@ public class Main {
                         =======================
                         """,
                 () -> {
+                    System.out.println("Users:");
+                    System.out.println("-".repeat(80));
+                    System.out.println("ID   | USERNAME       | EMAIL                          | TASKS ASSIGNED ");
+                    System.out.println("-".repeat(80));
+                    for (User user: userService.users) {
+                        if (user != null) {
+                            System.out.printf("%s | %-14s | %-30s | %s%n", user.ID, user.name, user.email, (user instanceof RegularUser)? ((RegularUser)(user)).assignedTasksIndex : "ADMIN");
+                        }
+                    }
+                    System.out.println("-".repeat(80));
+                    System.out.println();
                     System.out.println("Enter User ID: ");
                     String userID = ValidationUtils.getValidUserID(scanner);
                     User user = userService.findUser(userID);
@@ -276,11 +283,24 @@ public class Main {
                         }
                     }
                     System.out.println("-".repeat(80));
-                    System.out.println("Enter the Task ID of the Task you want to assign:");
+                    System.out.println("Enter the Task ID of the Task you want to assign or unassign:");
                     String assignedTask = ValidationUtils.getValidTaskID(scanner);
                     if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).status != Completable.STATUS.COMPLETED) {
-                        ((RegularUser) user).assign(assignedTask);
-                        System.out.println("Task assigned successfully.");
+                        String assign;
+                        do {
+                            System.out.println("Do You Want to Assign or Unassign? Y/N");
+                            assign = scanner.nextLine().toLowerCase();
+                            if (assign.equals("y") || assign.equals("n")) {
+                                break;
+                            } else {
+                                System.out.println("Invalid input. Please try again.");
+                            }
+                        } while (true);
+                        if (assign.equals("y")) {
+                            ((RegularUser) user).assign(assignedTask);
+                        } else {
+                            ((RegularUser) user).unAssign(assignedTask);
+                        }
                     } else {
                         System.out.println("No Such Pending or Running Task found.");
                     }
@@ -300,13 +320,13 @@ public class Main {
                 // Role based access
                 (userService.current_user instanceof AdminUser)
                         ? new ConsoleMenu[] {
-                                getAddTaskMenu(project.ID, scanner),
-                                getUpdateTaskMenu(project.ID, scanner),
-                                getDeleteTaskMenu(project.ID, scanner),
-                        }
+                        getAddTaskMenu(project.ID, scanner),
+                        getUpdateTaskMenu(project.ID, scanner),
+                        getDeleteTaskMenu(project.ID, scanner),
+                }
                         : new ConsoleMenu[] {
-                                getUpdateTaskMenu(project.ID, scanner),
-                        },
+                        getUpdateTaskMenu(project.ID, scanner),
+                },
                 "Back",
                 "Enter your choice:",
                 scanner
@@ -336,11 +356,7 @@ public class Main {
                     }
                     System.out.println("Enter initial status (Pending/In Progress/Completed):");
                     Completable.STATUS status = ValidationUtils.getValidTaskStatus(scanner);
-                    if (taskService.addTask(projectID, name, status)) {
-                        System.out.printf("Task \"%s\" added successfully to Project %s\n%n", name, projectID);
-                    } else {
-                        System.out.printf("Task \"%s\" was not added\n%n", name);
-                    }
+                    taskService.addTask(projectID, name, status);
                 }
         );
     }
@@ -368,11 +384,7 @@ public class Main {
                     }
                     System.out.println("Enter new status (Pending/In Progress/Completed):");
                     Completable.STATUS status = ValidationUtils.getValidTaskStatus(scanner);
-                    if (taskService.updateTask(projectID, taskID, status)) {
-                        System.out.printf("Task \"%s\" updated successfully%n", taskID);
-                    } else {
-                        System.out.printf("Task \"%s\" update failed%n", taskID);
-                    }
+                    taskService.updateTask(projectID, taskID, status);
                 }
         );
     }
@@ -398,11 +410,7 @@ public class Main {
                             projectID = defaultProjectID;
                         }
                     }
-                    if (taskService.removeTask(projectID, taskID)) {
-                        System.out.printf("Task \"%s\" removed successfully%n", taskID);
-                    } else {
-                        System.out.printf("Task \"%s\" remove failed%n", taskID);
-                    }
+                    taskService.removeTask(projectID, taskID);
                 }
         );
     }
@@ -480,11 +488,7 @@ public class Main {
                     } else {
                         project = new HardwareProject(name, description, teamSize, budget);
                     }
-                    if (projectService.createProject(project)) {
-                        System.out.printf("Project \"%s\" created successfully\n%n", name);
-                    } else {
-                        System.out.printf("Project \"%s\" was not added\n%n", name);
-                    }
+                    projectService.createProject(project);
                 }
         );
     }
@@ -499,11 +503,7 @@ public class Main {
                 () -> {
                     System.out.println("Enter Project ID:");
                     String projectID = ValidationUtils.getValidProjectID(scanner);
-                    if (projectService.removeProject(projectID)) {
-                        System.out.printf("Project \"%s\" removed successfully%n", projectID);
-                    } else {
-                        System.out.printf("Project \"%s\" remove failed%n", projectID);
-                    }
+                    projectService.removeProject(projectID);
                 }
         );
     }
@@ -541,15 +541,15 @@ public class Main {
                 // Role based access
                 (userService.current_user instanceof AdminUser)?
                         new ConsoleMenu[]{
-                        getViewTasksForProjectMenu(scanner),
-                        getAddTaskMenu("", scanner),
-                        getUpdateTaskMenu("", scanner),
-                        getDeleteTaskMenu("", scanner),
-                }:
+                                getViewTasksForProjectMenu(scanner),
+                                getAddTaskMenu("", scanner),
+                                getUpdateTaskMenu("", scanner),
+                                getDeleteTaskMenu("", scanner),
+                        }:
                         new ConsoleMenu[]{
-                        getViewTasksForProjectMenu(scanner),
-                        getUpdateTaskMenu("", scanner),
-                },
+                                getViewTasksForProjectMenu(scanner),
+                                getUpdateTaskMenu("", scanner),
+                        },
                 "Back",
                 "Enter your choice:",
                 scanner
@@ -585,25 +585,22 @@ public class Main {
                         ==============================
                         """,
                 () -> {
-                    Project[] projects = projectService.filterProjects(ProjectService.FILTER.ALL);
+                    reportService.updateReports();
                     System.out.println("-".repeat(80));
                     System.out.println("PROJECT ID | PROJECT NAME                   | TASKS | COMPLETED | PROGRESS (%)");
                     System.out.println("-".repeat(80));
                     double average_completion = 0;
-                    for (Project project : projects) {
-                        Task[] tasks = taskService.getProjectTasks(project.ID);
-                        int completedTasks = 0;
-                        for (Task task : tasks) {
-                            if (task.status == Task.STATUS.COMPLETED) {
-                                completedTasks++;
-                            }
+                    int numberOfProjects = 0;
+                    for (StatusReport report : reportService.reports) {
+                        if (report != null) {
+                            double progress = (report.CompletedTasks / (report.Tasks > 0? ((double) report.Tasks) : 1 )) * 100;
+                            average_completion += progress;
+                            System.out.println(String.format("%-10s | %-30s | %-5s | %-9s | %.2f", report.ProjectID, report.ProjectName, report.Tasks, report.CompletedTasks, progress) + "%");
+                            numberOfProjects += 1;
                         }
-                        double progress = (completedTasks / (double) tasks.length) * 100;
-                        average_completion += progress;
-                        System.out.println(String.format("%-10s | %-30s | %-5s | %-9s | %.2f", project.ID, project.Name, tasks.length, completedTasks, progress) + "%");
                     }
                     System.out.println("-".repeat(80));
-                    System.out.println(String.format("AVERAGE COMPLETION: %.2f", average_completion / projects.length) + "%");
+                    System.out.println(String.format("AVERAGE COMPLETION: %.2f", average_completion / (numberOfProjects > 0? numberOfProjects : 1)) + "%");
                     System.out.println("-".repeat(80));
                     System.out.println("Press enter to continue...");
                     scanner.nextLine();

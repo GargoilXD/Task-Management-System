@@ -6,11 +6,19 @@ import models.User;
 // This is the UserService class, responsible for Managing users.
 public class UserService {
     static final int MAX_USER_COUNT = 20;
-    User[] users = new User[MAX_USER_COUNT];
+    public User[] users = new User[MAX_USER_COUNT];
     // This counts the users
     int userIndex = 0;
     public User current_user = new AdminUser("Kobby", "12345");
 
+    public UserService(User[] users) {
+        for (User user : users) {
+            if (user != null) {
+                this.users[userIndex] = user;
+                userIndex++;
+            }
+        }
+    }
     // This function finds users by ID
     public User findUser(String userID) {
         for (int index = 0; index < userIndex; index++) {

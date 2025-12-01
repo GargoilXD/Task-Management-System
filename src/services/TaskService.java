@@ -12,6 +12,14 @@ public class TaskService {
     // This counts the tasks
     public int taskIndex = 0;
 
+    public TaskService(Task[] tasks) {
+        for (Task task : tasks) {
+            if (task != null) {
+                this.tasks[taskIndex] = task;
+                taskIndex++;
+            }
+        }
+    }
     // Gets all undeleted Tasks
     public Task[] getTasks() {
         // Create an array with size of taskIndex, that's the maximum possible size.
@@ -79,16 +87,15 @@ public class TaskService {
         }
         return null;
     }
-    public boolean addTask(String projectID, String name, Completable.STATUS status) {
+    public void addTask(String projectID, String name, Completable.STATUS status) {
         if (findTaskByName(projectID, name) != null) {
             System.out.println("Task already exists");
-            return false;
+            return;
         }
         Task task = getDeletedTask();
         if (task == null) {
             if (taskIndex >= MAX_TASK_COUNT) {
                 System.out.println("Maximum task count reached");
-                return false;
             }
             tasks[taskIndex] = new Task(projectID, String.format("T%03d", taskIndex + 1), name, status);
             taskIndex++;
@@ -103,27 +110,24 @@ public class TaskService {
             task.deleted = false;
         }
         System.out.println("Task Added");
-        return true;
     }
-    public boolean removeTask(String projectID, String taskID) {
+    public void removeTask(String projectID, String taskID) {
         Task task = findTask(projectID, taskID);
         if (task == null) {
             System.out.println("Task Not Found");
-            return false;
+            return;
         }
         // The slot is freed
         task.deleted = true;
         System.out.println("Task Deleted");
-        return true;
     }
-    public boolean updateTask(String projectID, String taskID, Completable.STATUS status) {
+    public void updateTask(String projectID, String taskID, Completable.STATUS status) {
         Task task = findTask(projectID, taskID);
         if (task == null) {
             System.out.println("Task Not Found");
-            return false;
+            return;
         }
         task.status = status;
         System.out.println("Task Updated");
-        return true;
     }
 }

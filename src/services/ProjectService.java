@@ -13,6 +13,15 @@ public class ProjectService {
     // This counts the projects
     int projectIndex = 0;
 
+    public ProjectService(Project[] projects) {
+        for (Project project : projects) {
+            if (project != null) {
+                this.projects[projectIndex] = project;
+                project.ID = String.format("P%03d", projectIndex + 1);
+                projectIndex++;
+            }
+        }
+    }
     public Project findProject(String projectID) {
         for (int index = 0; index < projectIndex; index++) {
             // Also check if task is deleted
@@ -39,16 +48,16 @@ public class ProjectService {
         }
         return null;
     }
-    public boolean createProject(Project project) {
+    public void createProject(Project project) {
         if (findProjectByName(project.Name) != null) {
             System.out.println("Project already exists");
-            return false;
+            return;
         }
         Project deletedProject = getDeletedProject();
         if (deletedProject == null) {
             if (projectIndex >= MAX_PROJECT_COUNT) {
                 System.out.println("Maximum number of projects reached");
-                return false;
+                return;
             }
             projects[projectIndex] = project;
             project.ID = String.format("P%03d", projectIndex + 1);
@@ -65,18 +74,16 @@ public class ProjectService {
             deletedProject.Deleted = false;
         }
         System.out.println("Project created successfully");
-        return true;
     }
-    public boolean removeProject(String projectID) {
+    public void removeProject(String projectID) {
         Project project = findProject(projectID);
         if (project == null) {
             System.out.println("Project not found");
-            return false;
+            return;
         }
         // The slot is freed
         project.Deleted = true;
         System.out.println("Project deleted successfully");
-        return true;
     }
     // Polymorphic method!
     public enum FILTER { ALL, SOFTWARE, HARDWARE, BUDGET }
@@ -87,6 +94,9 @@ public class ProjectService {
         Project[] filteredProjects = new Project[projectIndex];
         int filteredProjectsIndex = 0;
         for (int index = 0; index < projectIndex; index++) {
+            if (projects[index].Deleted) {
+                continue;
+            }
             switch (filter) {
                 case ALL:
                     filteredProjects[filteredProjectsIndex] = projects[index];
@@ -104,6 +114,9 @@ public class ProjectService {
                         filteredProjectsIndex++;
                     }
                     break;
+                case BUDGET:
+                    // Impossible case here, handled in the other function.
+                    break;
             }
         }
         // Shrink the array to the real size.
@@ -116,7 +129,7 @@ public class ProjectService {
         Project[] filteredProjects = new Project[projectIndex];
         int filteredProjectsIndex = 0;
         for (int index = 0; index < projectIndex; index++) {
-            if (projects[index].Budget >= min && projects[index].Budget <= max) {
+            if (projects[index].Budget >= min && projects[index].Budget <= max && !projects[index].Deleted) {
                 filteredProjects[filteredProjectsIndex] = projects[index];
                 filteredProjectsIndex++;
             }

@@ -7,7 +7,7 @@ public abstract class User {
     public String password;
     public String email;
     // Static variable that all objects share. For keeping track of user IDs
-    static int LastID;
+    static int LastID = 1;
 
     public User(String name, String password) {
         this.ID = String.format("U%03d", LastID);
