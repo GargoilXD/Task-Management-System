@@ -1,0 +1,111 @@
+package utilities;
+
+import java.util.function.Function;
+
+public class KArray<T> {
+    @SuppressWarnings("unchecked")
+    T[] elements = (T[]) new Object[10];
+    public int size = 0;
+
+    public KArray() {}
+    public KArray(T[] elements) {
+        for (T element : elements) {
+            add(element);
+        }
+    }
+    public void set(int index, T element) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        elements[index] = element;
+    }
+    public T get(int index) {
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        }
+        return elements[index];
+    }
+    public int findIndex(T element) {
+        for (int index = 0; index < size; index++) {
+            if (elements[index].equals(element)) {
+                return index;
+            }
+        }
+        return -1;
+    }
+    public T findElement(T element) {
+        for (int index = 0; index < size; index++) {
+            if (elements[index].equals(element)) {
+                return elements[index];
+            }
+        }
+        return null;
+    }
+    public boolean contains(T element) {
+        for (int index = 0; index < size; index++) {
+            if (elements[index].equals(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public T customFind(Function<T, Boolean> find) {
+        for (int index = 0; index < size; index++) {
+            if (find.apply(elements[index])) {
+                return elements[index];
+            }
+        }
+        return null;
+    }
+    public void add(T element) {
+        if (size == elements.length) extend();
+        elements[size++] = element;
+    }
+    public void removeIndex(int index) {
+        if (index < 0 || index >= size) throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        elements[index] = null;
+        for (; index < size; index++) {
+            if (elements[index] == null) {
+                elements[index] = elements[index + 1];
+                elements[index + 1] = null;
+            }
+        }
+        size--;
+    }
+    public void removeElement(T element) {
+        int index = findIndex(element);
+        if (index == -1) return;
+        elements[index] = null;
+        for (; index < size; index++) {
+            if (elements[index] == null) {
+                elements[index] = elements[index + 1];
+                elements[index + 1] = null;
+            }
+        }
+        size--;
+    }
+    public void clear() {
+        size = 0;
+    }
+    void extend() {
+        @SuppressWarnings("unchecked")
+        T[] extended = (T[]) new Object[elements.length * 2];
+        System.arraycopy(elements, 0, extended, 0, size);
+        elements = extended;
+    }
+    public T[] toArray() {
+        @SuppressWarnings("unchecked")
+        T[] array = (T[]) new Object[size];
+        System.arraycopy(elements, 0, array, 0, size);
+        return array;
+    }
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (int index = 0; index < size; index++) {
+            if (!builder.isEmpty()) builder.append(", ");
+            builder.append(elements[index]);
+        }
+        return builder.insert(0, "[").append("]").toString();
+    }
+}

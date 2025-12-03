@@ -1,13 +1,18 @@
-package utils;
+package utilities.ConsoleMenu;
 
-// This is the abstract ConsoleMenu class which is the base class for OptionMenu and ManualMenu
 public abstract class ConsoleMenu {
     public String name;
     public String title;
+    boolean root = false;
+    public boolean goToRoot = false;
 
     public ConsoleMenu(String name, String title) {
         this.name = name;
         this.title = title;
+    }
+    public ConsoleMenu asRoot() {
+        root = true;
+        return this;
     }
     // This is the abstract display method used by OptionMenu and ManualMenu
     public abstract void display();

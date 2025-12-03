@@ -1,25 +1,25 @@
 import interfaces.Completable;
-import models.*;
+import models.Projects.*;
+import models.StatusReport;
+import models.Task;
+import models.Users.*;
 import services.ProjectService;
 import services.ReportService;
 import services.TaskService;
 import services.UserService;
-import utils.ConsoleMenu;
-import utils.ManualMenu;
-import utils.OptionMenu;
-import utils.ValidationUtils;
+import utilities.ConsoleMenu.*;
+import utilities.Validator;
 
 import java.util.Scanner;
 
 public class Main {
-    // Services
-    // Initialization by creating sample values
     static UserService userService = new UserService(
             new User[] {
                     new AdminUser("Kobby", "12345"),
                     new AdminUser("Ama", "12345"),
-                    new RegularUser("Kofi", "12345", new String[] {"T001", "T002", "T003"}),
-            });
+                    new RegularUser("Kofi", "12345", new String[] {"T001", "T002", "T003"})
+            }
+    );
     static ProjectService projectService = new ProjectService(
             new Project[] {
                     new SoftwareProject("Alpha Tracker", "Task tracking app for startups", 5, 15000),
@@ -32,79 +32,35 @@ public class Main {
             });
     static TaskService taskService = new TaskService(
             new Task[] {
-                    new Task("P001", "T001", "Design Database", Task.STATUS.COMPLETED),
-                    new Task("P001", "T002", "Implement API", Task.STATUS.IN_PROGRESS),
-                    new Task("P001", "T003", "Write Unit Tests", Task.STATUS.PENDING),
-                    new Task("P002", "T004", "Gather Materials", Task.STATUS.COMPLETED),
-                    new Task("P002", "T005", "Build prototype", Task.STATUS.IN_PROGRESS),
-                    new Task("P003", "T006", "Define Backup Strategy", Task.STATUS.COMPLETED),
-                    new Task("P003", "T007", "Develop Sync Engine", Task.STATUS.IN_PROGRESS),
-                    new Task("P003", "T008", "Create UI Dashboard", Task.STATUS.PENDING),
-                    new Task("P004", "T009", "Circuit Design", Task.STATUS.COMPLETED),
-                    new Task("P004", "T010", "Firmware Development", Task.STATUS.IN_PROGRESS),
-                    new Task("P004", "T011", "Enclosure Prototyping", Task.STATUS.PENDING),
-                    new Task("P005", "T012", "User Authentication", Task.STATUS.COMPLETED),
-                    new Task("P005", "T013", "Document Upload Module", Task.STATUS.IN_PROGRESS),
-                    new Task("P005", "T014", "Integration with Payroll", Task.STATUS.PENDING),
-                    new Task("P006", "T015", "User Registration Flow", Task.STATUS.COMPLETED),
-                    new Task("P006", "T016", "Quiz Builder UI", Task.STATUS.IN_PROGRESS),
-                    new Task("P006", "T017", "Real-time Grading Engine", Task.STATUS.PENDING),
-                    new Task("P007", "T018", "Solar Panel Sourcing", Task.STATUS.COMPLETED),
-                    new Task("P007", "T019", "Battery Integration", Task.STATUS.COMPLETED),
-                    new Task("P007", "T020", "Safety & Overcharge Protection", Task.STATUS.IN_PROGRESS),
+                    new Task("P001", "Design Database", Task.STATUS.COMPLETED),
+                    new Task("P001", "Implement API", Task.STATUS.IN_PROGRESS),
+                    new Task("P001", "Write Unit Tests", Task.STATUS.PENDING),
+                    new Task("P002", "Gather Materials", Task.STATUS.COMPLETED),
+                    new Task("P002", "Build prototype", Task.STATUS.IN_PROGRESS),
+                    new Task("P003", "Define Backup Strategy", Task.STATUS.COMPLETED),
+                    new Task("P003", "Develop Sync Engine", Task.STATUS.IN_PROGRESS),
+                    new Task("P003", "Create UI Dashboard", Task.STATUS.PENDING),
+                    new Task("P004", "Circuit Design", Task.STATUS.COMPLETED),
+                    new Task("P004", "Firmware Development", Task.STATUS.IN_PROGRESS),
+                    new Task("P004", "Enclosure Prototyping", Task.STATUS.PENDING),
+                    new Task("P005", "User Authentication", Task.STATUS.COMPLETED),
+                    new Task("P005", "Document Upload Module", Task.STATUS.IN_PROGRESS),
+                    new Task("P005", "Integration with Payroll", Task.STATUS.PENDING),
+                    new Task("P006", "User Registration Flow", Task.STATUS.COMPLETED),
+                    new Task("P006", "Quiz Builder UI", Task.STATUS.IN_PROGRESS),
+                    new Task("P006", "Real-time Grading Engine", Task.STATUS.PENDING),
+                    new Task("P007", "Solar Panel Sourcing", Task.STATUS.COMPLETED),
+                    new Task("P007", "Battery Integration", Task.STATUS.COMPLETED),
+                    new Task("P007", "Safety & Overcharge Protection", Task.STATUS.IN_PROGRESS),
             });
-    public static ReportService reportService = new ReportService(projectService, taskService);
+    static ReportService reportService = new ReportService(projectService, taskService);
     public static void main(String[] args) {
-        reportService.updateReports();
-        Scanner scanner = new Scanner(System.in);
-        // Display the LoginMenu
-        getLoginMenu(scanner, true).display();
-        // Scanner is closed to free memory. Not sure if that was necessary.
-        scanner.close();
+        Validator.input = new Scanner(System.in);
+        getLoginMenu().asRoot().display();
+        Validator.input.close();
     }
-    // Display Project Details. Moved to function because it's used multiple times.
-    static String displayProjectDetails(Project project, Task[] tasks) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(
-                String.format(
-                        """
-                                Project Name: %s
-                                Type: %s
-                                Team Size: %s
-                                Budget: %s
-                                """,
-                        project.Name,
-                        project instanceof SoftwareProject? "Software" : "Hardware",
-                        project.TeamSize,
-                        project.Budget
-                )
-        );
-        builder.append("\n");
-        builder.append("Associated Tasks: \n");
-        builder.append("-".repeat(80));
-        builder.append("\n");
-        builder.append("ID   | TASK NAME            | STATUS\n");
-        builder.append("-".repeat(80));
-        builder.append("\n");
-        for (Task task : tasks) {
-            builder.append(String.format("%s | %-20s | %s\n", task.ID, task.name, task.status));
-        }
-        builder.append("-".repeat(80));
-        builder.append("\n");
-        double completionRate = 0;
-        for (Task task : tasks) {
-            if (task.status == Task.STATUS.COMPLETED) {
-                completionRate += 1;
-            }
-        }
-        completionRate /= tasks.length > 0 ? tasks.length : 1;
-        builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
-        return builder.toString();
-    }
-    // Now here are the Menu functions that display different menus.
-    // It is designed to be modular
-    static ConsoleMenu getLoginMenu(Scanner scanner, boolean main) {
-        return new ManualMenu(
+    static ConsoleMenu getLoginMenu() {
+        return new DynamicMenu(
                 "Login",
                 """
                         ==============================
@@ -117,189 +73,200 @@ public class Main {
                     while (true) {
                         if (tries == 0) {
                             System.out.println("Login Failed. Please try again later.");
-                            if (main) {
-                                System.exit(0);
-                            } else {
-                                return;
-                            }
-                        }
-                        System.out.println("Username: ");
-                        username = scanner.nextLine();
-                        System.out.println("Enter Password: ");
-                        password = scanner.nextLine();
-                        if (userService.validateCredentials(username, password)) {
-                            getMainMenu(scanner).display();
                             System.exit(0);
                         }
-                        tries--;
-                        System.out.printf("Wrong username or password. %s Tries left %n", tries);
+                        System.out.println("Username: ");
+                        username = Validator.input.nextLine();
+                        System.out.println("Enter Password: ");
+                        password = Validator.input.nextLine();
+                        if (userService.validateCredentials(username, password)) {
+                            ConsoleMenu mainMenu = getMainMenu();
+                            mainMenu.display();
+                            if (mainMenu.goToRoot) {
+                                tries = 5;
+                            } else {
+                                System.exit(0);
+                            }
+                        } else {
+                            tries--;
+                            System.out.printf("Wrong username or password. %s Tries left %n", tries);
+                        }
                     }
                 }
         );
     }
-    // Main Menu
-    static ConsoleMenu getMainMenu(Scanner scanner) {
+    static ConsoleMenu getMainMenu() {
         return new OptionMenu(
                 "Main Menu",
                 """
-                        =====================================
-                        JAVA PROJECT MANAGEMENT SYSTEM (JPMS)
-                        =====================================
-                        """,
+                    =====================================
+                    JAVA PROJECT MANAGEMENT SYSTEM (JPMS)
+                    =====================================
+                    """,
                 String.format("""
-                            Current User: %s %s
-                            
-                            Main Menu
-                            ---------""", userService.current_user.name, (userService.current_user instanceof AdminUser ? "(Admin)" : "")),
+                Current User: %s %s
+                
+                Main Menu
+                ---------""", userService.currentUser.name, (userService.currentUser instanceof AdminUser ? "(Admin)" : "")),
                 // Role based Access
                 // Admins can: ManageProjects, ManageTasks, ViewStatusReports, ManageUsers and SwitchUsers
                 // RegularUsers can: ManageProjects, ManageTasks, ViewStatusReports and SwitchUsers
-                (userService.current_user instanceof AdminUser)?
+                (userService.currentUser instanceof AdminUser)?
                         new ConsoleMenu[] {
-                                getManageProjectMenu(scanner),
-                                getManageTaskMenu(scanner),
-                                getViewStatusReportMenu(scanner),
-                                getManageUsersMenu(scanner),
-                                getSwitchUserMenu(scanner),
+                                getManageProjectMenu(),
+                                getManageTaskMenu(),
+                                getViewStatusReportMenu(),
+                                getManageUsersMenu(),
+                                getSwitchUserMenu()
                         }:
                         new ConsoleMenu[] {
-                                getManageProjectMenu(scanner),
-                                getManageTaskMenu(scanner),
-                                getViewStatusReportMenu(scanner),
-                                getSwitchUserMenu(scanner),
-                        }
-                ,
+                                getManageProjectMenu(),
+                                getManageTaskMenu(),
+                                getViewStatusReportMenu(),
+                                getSwitchUserMenu()
+                        },
                 "Exit",
-                "Enter your choice:",
-                scanner
+                "Enter your choice:"
         );
     }
-    static ConsoleMenu getManageUsersMenu(Scanner scanner) {
+    static String displayProjectDetails(Project project, Task[] tasks) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format(
+                """
+                    Project Name: %s
+                    Type: %s
+                    Team Size: %s
+                    Budget: %s
+                    """,
+                project.Name,
+                project instanceof SoftwareProject? "Software" : "Hardware",
+                project.TeamSize,
+                project.Budget
+        ));
+        builder.append("\n");
+        builder.append("Associated Tasks: \n");
+        builder.append("-".repeat(80));
+        builder.append("\n");
+        builder.append("ID   | TASK NAME            | STATUS\n");
+        builder.append("-".repeat(80));
+        builder.append("\n");
+        for (Task task : tasks) {
+            builder.append(String.format("%s | %-20s | %s\n", task.ID, task.Name, task.Status));
+        }
+        builder.append("-".repeat(80));
+        builder.append("\n");
+        double completionRate = 0;
+        for (Task task : tasks) {
+            if (task.Status == Task.STATUS.COMPLETED) {
+                completionRate += 1;
+            }
+        }
+        completionRate /= tasks.length > 0 ? tasks.length : 1;
+        builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
+        return builder.toString();
+    }
+    static ConsoleMenu getManageUsersMenu() {
         return new OptionMenu(
                 "Manage Users",
                 """
-                        ==============================
-                                 MANAGE USERS         \s
-                        ==============================
-                        
-                        """,
+                    ==============================
+                             MANAGE USERS         \s
+                    ==============================
+                    
+                    """,
                 "Options:",
                 new ConsoleMenu[] {
-                        getCreateUserMenu(scanner),
-                        getAssignUserTasksMenu(scanner)
+                        getCreateUserMenu(),
+                        getAssignUserTasksMenu()
                 },
                 "Back",
-                "Enter your choice",
-                scanner
+                "Enter your choice"
         );
     }
-    static ConsoleMenu getCreateUserMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getCreateUserMenu() {
+        return new DynamicMenu(
                 "Create User",
                 """
-                        =================
-                           CREATE USER   \s
-                        =================
-                        """,
+                    =================
+                       CREATE USER   \s
+                    =================
+                    """,
                 () -> {
                     System.out.println("Username: ");
-                    String username = scanner.nextLine();
+                    String username = Validator.input.nextLine();
                     System.out.println("Password: ");
-                    String password = scanner.nextLine();
+                    String password = Validator.input.nextLine();
                     System.out.println("Email: ");
-                    String email = scanner.nextLine();
-                    String admin;
-                    do {
-                        System.out.println("Is Admin? Y/N: ");
-                        admin = scanner.nextLine().toLowerCase();
-                        if (admin.equals("y") || admin.equals("n")) {
-                            break;
-                        } else {
-                            System.out.println("Invalid input. Please try again.");
-                        }
-                    } while (true);
-                    userService.addUser(admin.equals("y")? new AdminUser(username, password, email) : new RegularUser(username, password, email));
+                    String email = Validator.input.nextLine();
+                    System.out.println("Is Admin? Y/N: ");
+                    boolean isAdmin = Validator.getValidChoice();
+                    userService.addUser(isAdmin? new AdminUser(username, password, email) : new RegularUser(username, password, email));
                 }
         );
     }
-    static ConsoleMenu getAssignUserTasksMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getAssignUserTasksMenu() {
+        return new DynamicMenu(
                 "Assign User Tasks",
                 """
-                        =======================
-                           ASSIGN USER TASKS   \s
-                        =======================
-                        """,
+                    =======================
+                       ASSIGN USER TASKS   \s
+                    =======================
+                    """,
                 () -> {
                     System.out.println("Users:");
                     System.out.println("-".repeat(80));
                     System.out.println("ID   | USERNAME       | EMAIL                          | TASKS ASSIGNED ");
                     System.out.println("-".repeat(80));
-                    for (User user: userService.users) {
-                        if (user != null) {
-                            System.out.printf("%s | %-14s | %-30s | %s%n", user.ID, user.name, user.email, (user instanceof RegularUser)? ((RegularUser)(user)).assignedTasksIndex : "ADMIN");
-                        }
+                    for (User user: userService.getUsers()) {
+                        System.out.printf("%s | %-14s | %-30s | %s%n", user.ID, user.name, user.email, (user instanceof RegularUser)? ((RegularUser)(user)).assignedTasks.size : "ADMIN");
                     }
                     System.out.println("-".repeat(80));
                     System.out.println();
                     System.out.println("Enter User ID: ");
-                    String userID = ValidationUtils.getValidUserID(scanner);
-                    User user = userService.findUser(userID);
-                    Task[] tasks;
-                    switch (user) {
-                        case null -> {
-                            System.out.println("User not found.");
-                            System.out.println("Press enter to continue...");
-                            scanner.nextLine();
-                            return;
-                        }
+                    String userID = Validator.getValidUserID();
+                    RegularUser user;
+                    switch (userService.getUser(userID)) {
                         case AdminUser ignored -> {
                             System.out.println("Cannot assign an admin user.");
                             System.out.println("Press enter to continue...");
-                            scanner.nextLine();
+                            Validator.input.nextLine();
                             return;
                         }
-                        case RegularUser ignored -> tasks = taskService.getTasks();
+                        case RegularUser regularUser -> user = regularUser;
                         default -> {
-                            // Should be unreachable here.
+                            System.out.println("User not found.");
+                            System.out.println("Press enter to continue...");
+                            Validator.input.nextLine();
                             return;
                         }
                     }
+                    Task[] tasks = taskService.getTasks();
                     System.out.println("Associated Tasks:");
                     System.out.println("-".repeat(80));
                     System.out.println("ID   | TASK NAME                      | STATUS          | ASSIGNED");
                     System.out.println("-".repeat(80));
                     // Find Tasks for user
                     for (Task task : tasks) {
-                        if (task.status != Completable.STATUS.COMPLETED) {
+                        if (task.Status != Completable.STATUS.COMPLETED) {
                             boolean userTask = false;
-                            for (String taskID: ((RegularUser) user).assignedTasks) {
+                            for (String taskID: user.getAssignedTasks()) {
                                 if (taskID != null && taskID.equals(task.ID)) {
                                     userTask = true;
                                     break;
                                 }
                             }
-                            System.out.printf("%s | %-30s | %-15s | %s%n", task.ID, task.name, task.status, userTask? "o" : "x");
+                            System.out.printf("%s | %-30s | %-15s | %s%n", task.ID, task.Name, task.Status, userTask? "o" : "x");
                         }
                     }
                     System.out.println("-".repeat(80));
                     System.out.println("Enter the Task ID of the Task you want to assign or unassign:");
-                    String assignedTask = ValidationUtils.getValidTaskID(scanner);
-                    if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).status != Completable.STATUS.COMPLETED) {
-                        String assign;
-                        do {
-                            System.out.println("Do You Want to Assign or Unassign? Y/N");
-                            assign = scanner.nextLine().toLowerCase();
-                            if (assign.equals("y") || assign.equals("n")) {
-                                break;
-                            } else {
-                                System.out.println("Invalid input. Please try again.");
-                            }
-                        } while (true);
-                        if (assign.equals("y")) {
-                            ((RegularUser) user).assign(assignedTask);
+                    String assignedTask = Validator.getValidTaskID();
+                    if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).Status != Completable.STATUS.COMPLETED) {
+                        boolean assign = Validator.getValidChoice();
+                        if (assign) {
+                            user.assign(assignedTask);
                         } else {
-                            ((RegularUser) user).unAssign(assignedTask);
+                            user.unassign(assignedTask);
                         }
                     } else {
                         System.out.println("No Such Pending or Running Task found.");
@@ -307,126 +274,99 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getProjectDetailsMenu(Project project, Task[] tasks, Scanner scanner) {
+    static ConsoleMenu getProjectDetailsMenu(Project project, Task[] tasks) {
         return new OptionMenu(
                 "Project Details",
                 """
-                        ==============================
-                                PROJECT DETAILS      \s
-                        ==============================
-                        
-                        """ + displayProjectDetails(project, tasks),
+                    ==============================
+                            PROJECT DETAILS      \s
+                    ==============================
+                    
+                    """ + displayProjectDetails(project, tasks),
                 "Options:",
                 // Role based access
-                (userService.current_user instanceof AdminUser)
-                        ? new ConsoleMenu[] {
-                        getAddTaskMenu(project.ID, scanner),
-                        getUpdateTaskMenu(project.ID, scanner),
-                        getDeleteTaskMenu(project.ID, scanner),
-                }
-                        : new ConsoleMenu[] {
-                        getUpdateTaskMenu(project.ID, scanner),
+                new ConsoleMenu[] {
+                        getAddTaskMenu(project.ID),
+                        getUpdateTaskMenu(),
+                        getDeleteTaskMenu()
                 },
                 "Back",
-                "Enter your choice:",
-                scanner
+                "Enter your choice:"
         );
     }
-    static ConsoleMenu getAddTaskMenu(String defaultProjectID, Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getAddTaskMenu(String defaultProjectID) {
+        return new DynamicMenu(
                 "Add New Task",
                 """
-                        ======================
-                            ADD NEW TASK     \s
-                        ======================
-                        """,
+                    ======================
+                        ADD NEW TASK     \s
+                    ======================
+                    """,
                 () -> {
                     System.out.println("Enter task name:");
-                    String name = scanner.nextLine();
+                    String name = Validator.input.nextLine();
                     String projectID;
                     if (defaultProjectID.isEmpty()) {
                         System.out.println("Enter assign project ID:");
-                        projectID = ValidationUtils.getValidProjectID(scanner);
+                        projectID = Validator.getValidProjectID();
                     } else {
                         System.out.printf("Enter assign project ID (leave empty for default: %s):%n", defaultProjectID);
-                        projectID = ValidationUtils.getValidProjectID(scanner, "");
+                        projectID = Validator.getValidProjectID("");
                         if (projectID.isEmpty()) {
                             projectID = defaultProjectID;
                         }
                     }
                     System.out.println("Enter initial status (Pending/In Progress/Completed):");
-                    Completable.STATUS status = ValidationUtils.getValidTaskStatus(scanner);
-                    taskService.addTask(projectID, name, status);
+                    Completable.STATUS status = Validator.getValidTaskStatus();
+                    taskService.createTask(projectID, name, status);
                 }
         );
     }
-    static ConsoleMenu getUpdateTaskMenu(String defaultProjectID, Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getUpdateTaskMenu() {
+        return new DynamicMenu(
                 "Update Task Status",
                 """
-                        ======================
-                            UPDATE TASK     \s
-                        ======================
-                        """,
+                    ======================
+                        UPDATE TASK     \s
+                    ======================
+                    """,
                 () -> {
                     System.out.println("Enter task ID:");
-                    String taskID = ValidationUtils.getValidTaskID(scanner);
-                    String projectID;
-                    if (defaultProjectID.isEmpty()) {
-                        System.out.println("Enter assign project ID:");
-                        projectID = ValidationUtils.getValidProjectID(scanner);
-                    } else {
-                        System.out.printf("Enter assign project ID (leave empty for default: %s):%n", defaultProjectID);
-                        projectID = ValidationUtils.getValidProjectID(scanner, "");
-                        if (projectID.isEmpty()) {
-                            projectID = defaultProjectID;
-                        }
-                    }
+                    String taskID = Validator.getValidTaskID();
                     System.out.println("Enter new status (Pending/In Progress/Completed):");
-                    Completable.STATUS status = ValidationUtils.getValidTaskStatus(scanner);
-                    taskService.updateTask(projectID, taskID, status);
+                    Completable.STATUS status = Validator.getValidTaskStatus();
+                    taskService.updateTask(taskID, status);
                 }
         );
     }
-    static ConsoleMenu getDeleteTaskMenu(String defaultProjectID, Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getDeleteTaskMenu() {
+        return new DynamicMenu(
                 "Remove Task",
                 """
-                        ======================
-                            REMOVE TASK     \s
-                        ======================
-                        """,
+                    ======================
+                        REMOVE TASK     \s
+                    ======================
+                    """,
                 () -> {
                     System.out.println("Enter task ID:");
-                    String taskID = ValidationUtils.getValidTaskID(scanner);
-                    String projectID;
-                    if (defaultProjectID.isEmpty()) {
-                        System.out.println("Enter assign project ID:");
-                        projectID = ValidationUtils.getValidProjectID(scanner);
-                    } else {
-                        System.out.printf("Enter assign project ID (leave empty for default: %s):%n", defaultProjectID);
-                        projectID = ValidationUtils.getValidProjectID(scanner, "");
-                        if (projectID.isEmpty()) {
-                            projectID = defaultProjectID;
-                        }
-                    }
-                    taskService.removeTask(projectID, taskID);
+                    String taskID = Validator.getValidTaskID();
+                    taskService.removeTask(taskID);
                 }
         );
     }
-    // Note: doesn't return a menu. It's specifically for the getBrowseProjectsMenu ManualMenus
-    static void projectFilterProcess(ProjectService.FILTER filter, Scanner scanner) {
+    // Note: doesn't return a menu. It's specifically for the getBrowseProjectsMenu DynamicMenus
+    static void projectFilterProcess(ProjectService.FILTER filter) {
         Project[] projects;
         // If the filter is for BUDGET then we ask for the range
         if (filter == ProjectService.FILTER.BUDGET) {
             System.out.println("Enter min budget:");
-            int min = (int) ValidationUtils.getValidNumber(scanner, 0);
+            int min = (int) Validator.getValidNumber(0);
             System.out.println("Enter max budget:");
-            int max = (int) ValidationUtils.getValidNumber(scanner, 0);
-            projects = projectService.filterProjects(min, max);
-        } else {
-            projects = projectService.filterProjects(filter);
+            int max = (int) Validator.getValidNumber(0);
+            filter.min = min;
+            filter.max = max;
         }
+        projects = projectService.filterProjects(filter);
         System.out.println("-".repeat(80));
         System.out.println("ID   | PROJECT NAME                             | TYPE       | TEAM SIZE | BUDGET");
         System.out.println("-".repeat(80));
@@ -436,35 +376,34 @@ public class Main {
         }
         System.out.println("-".repeat(80));
         System.out.println("Enter project ID to view details (0 to return):");
-        String response = ValidationUtils.getValidProjectID(scanner, "0");
+        String response = Validator.getValidProjectID("0");
         if (!response.equals("0")) {
-            Project project = projectService.findProject(response);
+            Project project = projectService.findProjectByID(response);
             Task[] tasks = taskService.getProjectTasks(response);
-            getProjectDetailsMenu(project, tasks, scanner).display();
+            getProjectDetailsMenu(project, tasks).display();
         }
     }
-    static ConsoleMenu getBrowseProjectsMenu(Scanner scanner) {
+    static ConsoleMenu getBrowseProjectsMenu() {
         return new OptionMenu(
                 "Browse Projects",
                 """
-                        ==============================
-                                PROJECT CATALOG      \s
-                        ==============================
-                        """,
+                    ==============================
+                            PROJECT CATALOG      \s
+                    ==============================
+                    """,
                 "Filter Options:",
                 new ConsoleMenu[] {
-                        new ManualMenu("View All Projects", "", () -> projectFilterProcess(ProjectService.FILTER.ALL, scanner)),
-                        new ManualMenu("Software Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.SOFTWARE, scanner)),
-                        new ManualMenu("Hardware Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.HARDWARE, scanner)),
-                        new ManualMenu("Search by Budget Range", "", () -> projectFilterProcess(ProjectService.FILTER.BUDGET, scanner)),
+                        new DynamicMenu("View All Projects", "", () -> projectFilterProcess(ProjectService.FILTER.ALL)),
+                        new DynamicMenu("Software Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.SOFTWARE)),
+                        new DynamicMenu("Hardware Projects Only", "", () -> projectFilterProcess(ProjectService.FILTER.HARDWARE)),
+                        new DynamicMenu("Search by Budget Range", "", () -> projectFilterProcess(ProjectService.FILTER.BUDGET)),
                 },
                 "Back",
-                "Enter filter choice:",
-                scanner
+                "Enter filter choice:"
         );
     }
-    static ConsoleMenu getCreateProjectMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getCreateProjectMenu() {
+        return new DynamicMenu(
                 "Create Project",
                 """
                         ======================
@@ -473,27 +412,21 @@ public class Main {
                         """,
                 () -> {
                     System.out.println("Enter project name:");
-                    String name = scanner.nextLine();
+                    String name = Validator.input.nextLine();
                     System.out.println("Enter project type:");
-                    boolean isSoftware = ValidationUtils.getValidProjectType(scanner);
+                    boolean isSoftware = Validator.getValidProjectType();
                     System.out.println("Enter project description:");
-                    String description = scanner.nextLine();
+                    String description = Validator.input.nextLine();
                     System.out.println("Enter team size:");
-                    int teamSize = (int) ValidationUtils.getValidNumber(scanner, 1);
+                    int teamSize = Validator.getValidInteger(1);
                     System.out.println("Enter budget:");
-                    double budget = ValidationUtils.getValidNumber(scanner, 0);
-                    Project project;
-                    if (isSoftware) {
-                        project = new SoftwareProject(name, description, teamSize, budget);
-                    } else {
-                        project = new HardwareProject(name, description, teamSize, budget);
-                    }
-                    projectService.createProject(project);
+                    double budget = Validator.getValidNumber(0);
+                    projectService.createProject(name, description, teamSize, budget, isSoftware);
                 }
         );
     }
-    static ConsoleMenu getDeleteProjectMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getDeleteProjectMenu() {
+        return new DynamicMenu(
                 "Remove Project",
                 """
                         ======================
@@ -502,12 +435,12 @@ public class Main {
                         """,
                 () -> {
                     System.out.println("Enter Project ID:");
-                    String projectID = ValidationUtils.getValidProjectID(scanner);
+                    String projectID = Validator.getValidProjectID();
                     projectService.removeProject(projectID);
                 }
         );
     }
-    static ConsoleMenu getManageProjectMenu(Scanner scanner) {
+    static ConsoleMenu getManageProjectMenu() {
         return new OptionMenu(
                 "Manage Projects",
                 """
@@ -516,20 +449,20 @@ public class Main {
                         ==============================
                         """,
                 "Options:",
-                (userService.current_user instanceof AdminUser)? new ConsoleMenu[]{
-                        getCreateProjectMenu(scanner),
-                        getDeleteProjectMenu(scanner),
-                        getBrowseProjectsMenu(scanner),
-                }:new ConsoleMenu[]{
-                        getBrowseProjectsMenu(scanner),
+                (userService.currentUser instanceof AdminUser)
+                        ? new ConsoleMenu[] {
+                        getCreateProjectMenu(),
+                        getDeleteProjectMenu(),
+                        getBrowseProjectsMenu()
                 }
-                ,
+                        : new ConsoleMenu[] {
+                        getBrowseProjectsMenu()
+                },
                 "Back",
-                "Enter your choice:",
-                scanner
+                "Enter your choice:"
         );
     }
-    static ConsoleMenu getManageTaskMenu(Scanner scanner) {
+    static ConsoleMenu getManageTaskMenu() {
         return new OptionMenu(
                 "Manage Tasks",
                 """
@@ -538,52 +471,45 @@ public class Main {
                         ==============================
                         """,
                 "Options:",
-                // Role based access
-                (userService.current_user instanceof AdminUser)?
-                        new ConsoleMenu[]{
-                                getViewTasksForProjectMenu(scanner),
-                                getAddTaskMenu("", scanner),
-                                getUpdateTaskMenu("", scanner),
-                                getDeleteTaskMenu("", scanner),
-                        }:
-                        new ConsoleMenu[]{
-                                getViewTasksForProjectMenu(scanner),
-                                getUpdateTaskMenu("", scanner),
-                        },
+                new ConsoleMenu[] {
+                        getViewTasksForProjectMenu(),
+                        getAddTaskMenu(""),
+                        getUpdateTaskMenu(),
+                        getDeleteTaskMenu(),
+                },
                 "Back",
-                "Enter your choice:",
-                scanner
+                "Enter your choice:"
         );
     }
-    static ConsoleMenu getViewTasksForProjectMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getViewTasksForProjectMenu() {
+        return new DynamicMenu(
                 "View Tasks For Project",
                 """
-                        ==============================
-                                PROJECT CATALOG      \s
-                        ==============================
-                        """,
+                    ==============================
+                            PROJECT CATALOG      \s
+                    ==============================
+                    """,
                 () -> {
                     System.out.println("Enter project ID to view details (0 to return):");
-                    String response = ValidationUtils.getValidProjectID(scanner, "0");
+                    String response = Validator.getValidProjectID("0");
                     if (!response.equals("0")) {
-                        Project project = projectService.findProject(response);
+                        Project project = projectService.findProjectByID(response);
                         Task[] tasks = taskService.getProjectTasks(response);
                         System.out.println(displayProjectDetails(project, tasks));
                     }
                     System.out.println("Press enter to continue...");
-                    scanner.nextLine();
+                    Validator.input.nextLine();
                 }
         );
     }
-    static ConsoleMenu getViewStatusReportMenu(Scanner scanner) {
-        return new ManualMenu(
+    static ConsoleMenu getViewStatusReportMenu() {
+        return new DynamicMenu(
                 "View Status Reports",
                 """
-                        ==============================
-                             PROJECT STATUS REPORT    \s
-                        ==============================
-                        """,
+                    ==============================
+                         PROJECT STATUS REPORT    \s
+                    ==============================
+                    """,
                 () -> {
                     reportService.updateReports();
                     System.out.println("-".repeat(80));
@@ -591,7 +517,7 @@ public class Main {
                     System.out.println("-".repeat(80));
                     double average_completion = 0;
                     int numberOfProjects = 0;
-                    for (StatusReport report : reportService.reports) {
+                    for (StatusReport report : reportService.reports.toArray()) {
                         if (report != null) {
                             double progress = (report.CompletedTasks / (report.Tasks > 0? ((double) report.Tasks) : 1 )) * 100;
                             average_completion += progress;
@@ -603,18 +529,13 @@ public class Main {
                     System.out.println(String.format("AVERAGE COMPLETION: %.2f", average_completion / (numberOfProjects > 0? numberOfProjects : 1)) + "%");
                     System.out.println("-".repeat(80));
                     System.out.println("Press enter to continue...");
-                    scanner.nextLine();
+                    Validator.input.nextLine();
                 }
         );
     }
-    static ConsoleMenu getSwitchUserMenu(Scanner scanner) {
-        // Login menu reuse
-        ConsoleMenu menu = getLoginMenu(scanner, false);
-        menu.name = "Switch User";
-        menu.title = """
-                        ==============================
-                                  SWITCH USER         \s
-                        ==============================""";
-        return menu;
+    static ConsoleMenu getSwitchUserMenu() {
+        ConsoleMenu switchUserMenu = new DynamicMenu("Switch User", "", () -> {});
+        switchUserMenu.goToRoot = true;
+        return switchUserMenu;
     }
 }

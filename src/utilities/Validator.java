@@ -1,14 +1,14 @@
-package utils;
+package utilities;
 
-import java.util.Scanner;
 import interfaces.Completable;
 
-// The functions in this class repeatedly prompts the user until they give a valid response
-public class ValidationUtils {
-    public static String getValidTaskID(Scanner scanner) {
-        // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. T001).
+import java.util.Scanner;
+
+public class Validator {
+    public static Scanner input;
+    public static String getValidTaskID() {
         while (true) {
-            String response = scanner.nextLine().trim();
+            String response = input.nextLine().trim();
             if (response.matches("^T\\d{3}$")) {
                 return response;
             } else {
@@ -17,10 +17,10 @@ public class ValidationUtils {
             }
         }
     }
-    public static String getValidProjectID(Scanner scanner) {
+    public static String getValidProjectID() {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001).
         while (true) {
-            String response = scanner.nextLine().trim();
+            String response = input.nextLine().trim();
             if (response.matches("^P\\d{3}$")) {
                 return response;
             } else {
@@ -29,10 +29,10 @@ public class ValidationUtils {
             }
         }
     }
-    public static String getValidProjectID(Scanner scanner, String orAccept) {
+    public static String getValidProjectID(String orAccept) {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. P001).
         while (true) {
-            String response = scanner.nextLine().trim();
+            String response = input.nextLine().trim();
             if (response.matches("^P\\d{3}$")) {
                 return response;
             } else if (response.equals(orAccept)) {
@@ -43,10 +43,10 @@ public class ValidationUtils {
             }
         }
     }
-    public static String getValidUserID(Scanner scanner) {
+    public static String getValidUserID() {
         // Error: Invalid input. Please enter a valid numeric or prefixed ID (e.g. U001).
         while (true) {
-            String response = scanner.nextLine().trim();
+            String response = input.nextLine().trim();
             if (response.matches("^U\\d{3}$")) {
                 return response;
             } else {
@@ -55,12 +55,12 @@ public class ValidationUtils {
             }
         }
     }
-    public static Completable.STATUS getValidTaskStatus(Scanner scanner) {
+    public static Completable.STATUS getValidTaskStatus() {
         // Error: Invalid status. Please choose from [Pending, In Progress, Completed].
         while (true) {
-            String response = scanner.nextLine().trim();
-            if (response.matches("^\\s*(Pending|In Progress|Completed)\\s*$")) {
-                switch (response.toLowerCase()) {
+            String response = input.nextLine().trim().toLowerCase();
+            if (response.matches("^\\s*(pending|in progress|completed)\\s*$")) {
+                switch (response) {
                     case "pending": return Completable.STATUS.PENDING;
                     case "in progress": return Completable.STATUS.IN_PROGRESS;
                     case "completed": return Completable.STATUS.COMPLETED;
@@ -71,12 +71,12 @@ public class ValidationUtils {
             }
         }
     }
-    public static boolean getValidProjectType(Scanner scanner) {
+    public static boolean getValidProjectType() {
         // Error: Invalid type. Please choose from [Software, Hardware].
         while (true) {
-            String response = scanner.nextLine().trim();
-            if (response.matches("^\\s*(Software|Hardware)\\s*$")) {
-                switch (response.toLowerCase()) {
+            String response = input.nextLine().trim().toLowerCase();
+            if (response.matches("^\\s*(software|hardware)\\s*$")) {
+                switch (response) {
                     case "software": return true;
                     case "hardware": return false;
                 }
@@ -86,11 +86,11 @@ public class ValidationUtils {
             }
         }
     }
-    public static double getValidNumber(Scanner scanner, int min) {
+    public static double getValidNumber(int min) {
         while (true) {
             try {
-                double response = scanner.nextDouble();
-                scanner.nextLine();
+                double response = input.nextDouble();
+                input.nextLine();
                 if (response >= min) {
                     return response;
                 } else {
@@ -99,9 +99,55 @@ public class ValidationUtils {
             } catch (Exception e) {
                 System.out.println("Expected number");
                 System.out.println("Enter again:");
-                scanner.nextLine();
+                input.nextLine();
             }
-
+        }
+    }
+    public static int getValidInteger(int min, int max) {
+        while (true) {
+            try {
+                int response = input.nextInt();
+                input.nextLine();
+                if (response >= min && response <= max) {
+                    return response;
+                } else {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                System.out.println("Expected number");
+                System.out.println("Enter again:");
+                input.nextLine();
+            }
+        }
+    }
+    public static int getValidInteger(int min) {
+        while (true) {
+            try {
+                int response = input.nextInt();
+                input.nextLine();
+                if (response >= min) {
+                    return response;
+                } else {
+                    throw new Exception();
+                }
+            } catch (Exception e) {
+                System.out.println("Expected number");
+                System.out.println("Enter again:");
+                input.nextLine();
+            }
+        }
+    }
+    public static boolean getValidChoice() {
+        while (true) {
+            String response = input.nextLine().trim().toLowerCase();
+            if (response.equals("y")) {
+                return true;
+            } else if (response.equals("n")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter a valid choice (Y/N)");
+                System.out.println("Enter again:");
+            }
         }
     }
 }

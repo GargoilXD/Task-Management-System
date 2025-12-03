@@ -1,15 +1,13 @@
 package services;
 
 import interfaces.Completable;
-import models.Project;
+import models.Projects.Project;
 import models.StatusReport;
 import models.Task;
+import utilities.KArray;
 
 public class ReportService {
-    static final int MAX_REPORT_COUNT = 10;
-    public StatusReport[] reports = new StatusReport[MAX_REPORT_COUNT];
-    // This counts the reports
-    int reportIndex = 0;
+    public KArray<StatusReport> reports = new KArray<StatusReport>();
     ProjectService projectService;
     TaskService taskService;
     public ReportService(ProjectService projectService, TaskService taskService) {
@@ -18,28 +16,18 @@ public class ReportService {
     }
 
     public void updateReports() {
-        reportIndex = 0;
-        for (Project project : projectService.filterProjects(ProjectService.FILTER.ALL)) {
-            Task[] projectTasks = taskService.getProjectTasks(project.ID);
-            // Object reuse
-            if (reports[reportIndex] != null) {
-                 reports[reportIndex].ProjectID = project.ID;
-                 reports[reportIndex].ProjectName = project.Name;
-                reports[reportIndex].CompletedTasks = 0;
-                reports[reportIndex].UnCompletedTasks = 0;
-                reports[reportIndex].Tasks = 0;
-            } else {
-                reports[reportIndex] = new StatusReport(project.ID, project.Name, 0 ,0, 0);
-            }
-            for (Task task : projectTasks) {
-                if (task.status == Completable.STATUS.COMPLETED) {
-                    reports[reportIndex].CompletedTasks += 1;
+        reports.clear();
+        for (Project project : projectService.getProjects()) {
+            StatusReport newReport = new StatusReport(project.ID, project.Name, 0 ,0, 0);
+            for (Task task : taskService.getProjectTasks(project.ID)) {
+                if (task.Status == Completable.STATUS.COMPLETED) {
+                    newReport.CompletedTasks += 1;
                 } else {
-                    reports[reportIndex].UnCompletedTasks += 1;
+                    newReport.UnCompletedTasks += 1;
                 }
-                reports[reportIndex].Tasks += 1;
+                newReport.Tasks += 1;
             }
-            reportIndex++;
+            reports.add(newReport);
         }
     }
 }

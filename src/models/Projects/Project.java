@@ -1,22 +1,16 @@
-package models;
+package models.Projects;
 
-// This is the abstract Project class
 public abstract class Project {
     public String ID;
     public String Name;
     public String Description;
     public int TeamSize;
     public double Budget;
-    public boolean Deleted = false;
+    static int LastID = 1;
 
     public Project(String Name, String Description, int TeamSize, double Budget) {
-        this.Name = Name;
-        this.Description = Description;
-        this.TeamSize = TeamSize;
-        this.Budget = Budget;
-    }
-    public Project(String ID, String Name, String Description, int TeamSize, double Budget) {
-        this.ID = ID;
+        this.ID = String.format("P%03d", LastID);
+        LastID++;
         this.Name = Name;
         this.Description = Description;
         this.TeamSize = TeamSize;

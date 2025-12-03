@@ -4,16 +4,17 @@ import interfaces.Completable;
 
 // This is the User Class
 public class Task implements Completable {
-    public String projectID;
+    public String ProjectID;
     public String ID;
-    public String name;
-    public STATUS status;
-    // Memory management design decision. This is the delete flag
-    public boolean deleted = false;
-    public Task(String projectID, String ID, String name, STATUS status) {
-        this.ID = ID;
-        this.projectID = projectID;
-        this.name = name;
-        this.status = status;
+    public String Name;
+    public STATUS Status;
+    static int LastID = 1;
+
+    public Task(String ProjectID, String Name, STATUS Status) {
+        this.ID = String.format("T%03d", LastID);
+        LastID++;
+        this.ProjectID = ProjectID;
+        this.Name = Name;
+        this.Status = Status;
     }
 }

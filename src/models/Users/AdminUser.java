@@ -1,4 +1,4 @@
-package models;
+package models.Users;
 
 // This is the class for AdminUsers
 public class AdminUser extends User {

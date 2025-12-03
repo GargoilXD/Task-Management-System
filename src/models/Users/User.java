@@ -1,4 +1,4 @@
-package models;
+package models.Users;
 
 // This is the User Class
 public abstract class User {

@@ -1,4 +1,4 @@
-package models;
+package models.Projects;
 
 // This is the SoftwareProject class
 public class SoftwareProject extends Project {

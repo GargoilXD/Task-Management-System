@@ -86,3 +86,6 @@ java Main
 
 ## Design Decisions
 - [Design Decisions](docs/design-decisions.md): Outlines the design choices made during development.
+
+## UML
+- [UML](docs/UML%20Diagram.png): Indicates the UML diagram for the project
