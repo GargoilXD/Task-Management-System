@@ -6,6 +6,7 @@ public abstract class Project {
     public String Description;
     public int TeamSize;
     public double Budget;
+    // Static variable that all objects share. For keeping track of IDs
     static int LastID = 1;
 
     public Project(String Name, String Description, int TeamSize, double Budget) {

@@ -3,23 +3,23 @@ package models.Users;
 // This is the User Class
 public abstract class User {
     public String ID;
-    public String name;
-    public String password;
-    public String email;
+    public String Name;
+    public String Password;
+    public String Email;
     // Static variable that all objects share. For keeping track of user IDs
     static int LastID = 1;
 
-    public User(String name, String password) {
+    public User(String Name, String Password) {
         this.ID = String.format("U%03d", LastID);
         LastID++;
-        this.name = name;
-        this.password = password;
+        this.Name = Name;
+        this.Password = Password;
     }
-    public User(String name, String password, String email) {
+    public User(String Name, String Password, String Email) {
         this.ID = String.format("U%03d", LastID);
         LastID++;
-        this.name = name;
-        this.password = password;
-        this.email = email;
+        this.Name = Name;
+        this.Password = Password;
+        this.Email = Email;
     }
 }

@@ -1,17 +1,32 @@
 package utilities;
 
+import java.util.NoSuchElementException;
 import java.util.function.Function;
+import java.lang.reflect.Array;
 
 public class KArray<T> {
     @SuppressWarnings("unchecked")
     T[] elements = (T[]) new Object[10];
     public int size = 0;
+    Class<T> genericClass;
 
-    public KArray() {}
-    public KArray(T[] elements) {
+    public KArray(Class<T> genericClass) {
+        this.genericClass = genericClass;
+    }
+    public KArray(T[] elements, Class<T> genericClass) {
+        this.genericClass = genericClass;
         for (T element : elements) {
             add(element);
         }
+    }
+    @SuppressWarnings("unchecked")
+    T[] newArray(int size) {
+        return (T[]) Array.newInstance(genericClass, size);
+    }
+    void extend() {
+        T[] extended = newArray(elements.length * 2);
+        System.arraycopy(elements, 0, extended, 0, size);
+        elements = extended;
     }
     public void set(int index, T element) {
         if (index < 0 || index >= size) {
@@ -66,20 +81,24 @@ public class KArray<T> {
         elements[index] = null;
         for (; index < size; index++) {
             if (elements[index] == null) {
-                elements[index] = elements[index + 1];
-                elements[index + 1] = null;
+                if ((index + 1) < size) {
+                    elements[index] = elements[index + 1];
+                    elements[index + 1] = null;
+                }
             }
         }
         size--;
     }
     public void removeElement(T element) {
         int index = findIndex(element);
-        if (index == -1) return;
+        if (index == -1) throw new NoSuchElementException("");
         elements[index] = null;
         for (; index < size; index++) {
             if (elements[index] == null) {
-                elements[index] = elements[index + 1];
-                elements[index + 1] = null;
+                if ((index + 1) < size) {
+                    elements[index] = elements[index + 1];
+                    elements[index + 1] = null;
+                }
             }
         }
         size--;
@@ -87,15 +106,11 @@ public class KArray<T> {
     public void clear() {
         size = 0;
     }
-    void extend() {
-        @SuppressWarnings("unchecked")
-        T[] extended = (T[]) new Object[elements.length * 2];
-        System.arraycopy(elements, 0, extended, 0, size);
-        elements = extended;
+    public boolean isEmpty() {
+        return size == 0;
     }
     public T[] toArray() {
-        @SuppressWarnings("unchecked")
-        T[] array = (T[]) new Object[size];
+        T[] array = newArray(size);
         System.arraycopy(elements, 0, array, 0, size);
         return array;
     }

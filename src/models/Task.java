@@ -8,6 +8,7 @@ public class Task implements Completable {
     public String ID;
     public String Name;
     public STATUS Status;
+    // Static variable that all objects share. For keeping track of user IDs
     static int LastID = 1;
 
     public Task(String ProjectID, String Name, STATUS Status) {

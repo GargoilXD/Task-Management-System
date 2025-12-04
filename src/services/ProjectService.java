@@ -3,23 +3,31 @@ package services;
 import models.Projects.HardwareProject;
 import models.Projects.Project;
 import models.Projects.SoftwareProject;
+import services.exceptions.EntityAlreadyExists;
 import utilities.KArray;
 
-public class ProjectService {
-    public enum FILTER {
-        ALL(0, 0),
-        SOFTWARE(0, 0),
-        HARDWARE(0, 0),
-        BUDGET(0, 0);
+import java.util.NoSuchElementException;
 
-        public int min;
-        public int max;
-        FILTER(int min, int max) {
-            this.min = min;
-            this.max = max;
+public class ProjectService {
+    // FatEnum
+    public static class FILTER {
+        public static class ALL extends FILTER {}
+        public static class SOFTWARE extends FILTER {}
+        public static class HARDWARE extends FILTER {}
+        public static class BUDGET extends FILTER {
+            public final int min;
+            public final int max;
+            public BUDGET() {
+                this.min = 0;
+                this.max = 0;
+            }
+            public BUDGET(int min, int max) {
+                this.min = min;
+                this.max = max;
+            }
         }
     }
-    KArray<Project> projects =  new KArray<Project>();
+    KArray<Project> projects =  new KArray<Project>(Project.class);
 
     public ProjectService(Project[] projects) {
         for (Project project : projects) {
@@ -30,21 +38,23 @@ public class ProjectService {
         return projects.toArray();
     }
     public Project[] filterProjects(FILTER filter) {
-        KArray<Project> filteredProjects = new KArray<Project>();
+        KArray<Project> filteredProjects = new KArray<Project>(Project.class);
         for (Project project : projects.toArray()) {
             switch (filter) {
-                case ALL:
+                case FILTER.ALL ignored:
                     filteredProjects.add(project);
                     break;
-                case SOFTWARE:
+                case FILTER.SOFTWARE ignored:
                     if (project instanceof SoftwareProject) filteredProjects.add(project);
                     break;
-                case HARDWARE:
+                case FILTER.HARDWARE ignored:
                     if (project instanceof HardwareProject) filteredProjects.add(project);
                     break;
-                case BUDGET:
-                    if (project.Budget >= filter.min && project.Budget <= filter.max)filteredProjects.add(project);
+                case FILTER.BUDGET budget:
+                    if (project.Budget >= budget.min && project.Budget <= budget.max) filteredProjects.add(project);
                     break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + filter);
             }
         }
         return filteredProjects.toArray();
@@ -56,7 +66,7 @@ public class ProjectService {
         return projects.customFind((project) -> project.Name.equals(Name));
     }
     public void createProject(String Name, String Description, int TeamSize, double Budget, boolean isSoftwareProject) {
-        if (findProjectByName(Name) != null) return;
+        if (findProjectByName(Name) != null) throw new EntityAlreadyExists("Project already exists");
         if (isSoftwareProject) {
             projects.add(new SoftwareProject(Name, Description, TeamSize, Budget));
         } else {
@@ -64,6 +74,8 @@ public class ProjectService {
         }
     }
     public void removeProject(String ID) {
-        projects.removeElement(projects.customFind((project) -> project.ID.equals(ID)));
+        Project found = findProjectByID(ID);
+        if (found == null) throw new NoSuchElementException("Project with ID " + ID + " does not exist");
+        projects.removeElement(found);
     }
 }

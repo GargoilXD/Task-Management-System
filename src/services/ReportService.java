@@ -7,14 +7,14 @@ import models.Task;
 import utilities.KArray;
 
 public class ReportService {
-    public KArray<StatusReport> reports = new KArray<StatusReport>();
+    public KArray<StatusReport> reports = new KArray<StatusReport>(StatusReport.class);
     ProjectService projectService;
     TaskService taskService;
+
     public ReportService(ProjectService projectService, TaskService taskService) {
         this.projectService = projectService;
         this.taskService = taskService;
     }
-
     public void updateReports() {
         reports.clear();
         for (Project project : projectService.getProjects()) {
