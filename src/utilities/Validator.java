@@ -3,7 +3,9 @@ package utilities;
 import interfaces.Completable;
 
 import java.util.Scanner;
+import java.util.function.Function;
 
+// The functions in this class repeatedly prompts the user until they give a valid response
 public class Validator {
     public static Scanner input;
     public static String getValidTaskID() {
@@ -146,6 +148,28 @@ public class Validator {
                 return false;
             } else {
                 System.out.println("Invalid input. Please enter a valid choice (Y/N)");
+                System.out.println("Enter again:");
+            }
+        }
+    }
+    public static String manualValidation(Function<String, Boolean> function, String errorMessage) {
+        while (true) {
+            String response = input.nextLine().trim();
+            if (function.apply(response)) {
+                return response;
+            } else {
+                System.out.println(errorMessage);
+                System.out.println("Enter again:");
+            }
+        }
+    }
+    public static String getValidEmail() {
+        while (true) {
+            String response = input.nextLine().trim().toLowerCase();
+            if (response.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
+                return response;
+            } else {
+                System.out.println("Invalid email.");
                 System.out.println("Enter again:");
             }
         }
