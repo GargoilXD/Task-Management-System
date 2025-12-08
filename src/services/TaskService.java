@@ -3,9 +3,8 @@ package services;
 import interfaces.Completable;
 import models.Task;
 import utilities.exceptions.EntityAlreadyExists;
+import utilities.exceptions.EntityDoesNotExist;
 import utilities.KArray;
-
-import java.util.NoSuchElementException;
 
 public class TaskService {
     KArray<Task> tasks = new KArray<>(Task.class);
@@ -39,12 +38,12 @@ public class TaskService {
     }
     public void removeTask(String ID) {
         Task found = findTaskByID(ID);
-        if (found == null) throw new NoSuchElementException("Task with ID " + ID + " does not exist");
+        if (found == null) throw new EntityDoesNotExist("Task with ID " + ID + " does not exist");
         tasks.removeElement(found);
     }
     public void updateTask(String TaskID, Completable.STATUS Status) {
         Task task = findTaskByID(TaskID);
-        if (task == null) return;
+        if (task == null) throw new EntityDoesNotExist("Task with ID " + TaskID + " does not exist");
         task.Status = Status;
     }
 }

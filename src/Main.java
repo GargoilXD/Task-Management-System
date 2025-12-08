@@ -9,6 +9,8 @@ import services.TaskService;
 import services.UserService;
 import utilities.ConsoleMenu.*;
 import utilities.Validator;
+import utilities.exceptions.EntityAlreadyExists;
+import utilities.exceptions.EntityDoesNotExist;
 
 import java.util.Scanner;
 
@@ -79,7 +81,7 @@ public class Main {
                     int tries = 5;
                     while (true) {
                         if (tries == 0) {
-                            System.out.println("Login Failed. Please try again later.");
+                            System.err.println("Login Failed. Please try again later.");
                             System.exit(0);
                         }
                         System.out.println("Username: ");
@@ -96,7 +98,7 @@ public class Main {
                             }
                         } else {
                             tries--;
-                            System.out.printf("Wrong username or password. %s Tries left %n", tries);
+                            System.err.printf("Wrong username or password. %s Tries left %n", tries);
                         }
                     }
                 }
@@ -207,7 +209,12 @@ public class Main {
                     String email = Validator.getValidEmail();
                     System.out.println("Is Admin? Y/N: ");
                     boolean isAdmin = Validator.getValidChoice();
-                    userService.addUser(isAdmin? new AdminUser(username, password, email) : new RegularUser(username, password, email));
+                    try {
+                        userService.addUser(isAdmin? new AdminUser(username, password, email) : new RegularUser(username, password, email));
+                        System.out.println("User created!");
+                    } catch (EntityAlreadyExists e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -234,13 +241,13 @@ public class Main {
                     RegularUser user;
                     switch (userService.findUserByID(userID)) {
                         case null -> {
-                            System.out.println("User not found.");
+                            System.err.println("User not found.");
                             System.out.println("Press enter to continue...");
                             Validator.input.nextLine();
                             return;
                         }
                         case AdminUser ignored -> {
-                            System.out.println("Cannot assign an admin user.");
+                            System.err.println("Cannot assign an admin user.");
                             System.out.println("Press enter to continue...");
                             Validator.input.nextLine();
                             return;
@@ -272,22 +279,25 @@ public class Main {
                     System.out.println("Enter the Task ID of the Task you want to assign or unassign:");
                     String assignedTask = Validator.getValidTaskID();
                     if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).Status != Completable.STATUS.COMPLETED) {
+                        System.out.println("Enter y to assign and n to unassign:");
                         boolean assign = Validator.getValidChoice();
                         if (assign) {
                             if (user.isAssignedTask(assignedTask)) {
                                 System.err.println("Cannot assign an assigned task.");
                             } else {
                                 user.assign(assignedTask);
+                                System.out.println("Assigned Task: " + assignedTask + " to User: " + user.ID);
                             }
                         } else {
                             if (!user.isAssignedTask(assignedTask)) {
                                 System.err.println("Cannot unassign an unassigned task.");
                             } else {
                                 user.unassign(assignedTask);
+                                System.out.println("Unassigned Task: " + assignedTask + " from User: " + user.ID);
                             }
                         }
                     } else {
-                        System.out.println("No Such Pending or Running Task found.");
+                        System.err.println("No Such Pending or Running Task found.");
                     }
                 }
         );
@@ -336,7 +346,12 @@ public class Main {
                     }
                     System.out.println("Enter initial status (Pending/In Progress/Completed):");
                     Completable.STATUS status = Validator.getValidTaskStatus();
-                    taskService.createTask(projectID, name, status);
+                    try {
+                        taskService.createTask(projectID, name, status);
+                        System.out.println("Task Created!");
+                    } catch (EntityAlreadyExists e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -353,7 +368,12 @@ public class Main {
                     String taskID = Validator.getValidTaskID();
                     System.out.println("Enter new status (Pending/In Progress/Completed):");
                     Completable.STATUS status = Validator.getValidTaskStatus();
-                    taskService.updateTask(taskID, status);
+                    try {
+                        taskService.updateTask(taskID, status);
+                        System.out.println("Task updated successfully.");
+                    } catch (EntityAlreadyExists e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -368,7 +388,12 @@ public class Main {
                 () -> {
                     System.out.println("Enter task ID:");
                     String taskID = Validator.getValidTaskID();
-                    taskService.removeTask(taskID);
+                    try {
+                        taskService.removeTask(taskID);
+                        System.out.println("Task removed successfully.");
+                    } catch (EntityDoesNotExist e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -385,7 +410,7 @@ public class Main {
                 System.out.println("Enter max budget:");
                 max = (int) Validator.getValidNumber(0);
                 if (min > max) {
-                    System.out.println("Minimum budget is greater than maximum budget.");
+                    System.err.println("Minimum budget is greater than maximum budget.");
                     System.out.println("Try again:");
                 } else {
                     break;
@@ -408,7 +433,7 @@ public class Main {
         if (!response.equals("0")) {
             Project project = projectService.findProjectByID(response);
             if (project == null) {
-                System.out.println("Project " + response + " not found.");
+                System.err.println("Project " + response + " not found.");
                 return;
             }
             Task[] tasks = taskService.getProjectTasks(response);
@@ -453,7 +478,12 @@ public class Main {
                     int teamSize = Validator.getValidInteger(1);
                     System.out.println("Enter budget:");
                     double budget = Validator.getValidNumber(0);
-                    projectService.createProject(name, description, teamSize, budget, isSoftware);
+                    try {
+                        projectService.createProject(name, description, teamSize, budget, isSoftware);
+                        System.out.println("Project created successfully.");
+                    } catch (Exception e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -468,8 +498,12 @@ public class Main {
                 () -> {
                     System.out.println("Enter Project ID:");
                     String projectID = Validator.manualValidation((input) -> projectService.findProjectByID(input) != null, "Project does not exist");
-                    projectService.removeProject(projectID);
-                    System.out.println("Project " + projectID + " has been removed.");
+                    try {
+                        projectService.removeProject(projectID);
+                        System.out.println("Project " + projectID + " has been removed.");
+                    } catch (EntityDoesNotExist e) {
+                        System.err.println(e.getMessage());
+                    }
                 }
         );
     }
@@ -527,6 +561,10 @@ public class Main {
                     String response = Validator.getValidProjectID("0");
                     if (!response.equals("0")) {
                         Project project = projectService.findProjectByID(response);
+                        if (project == null) {
+                            System.err.println("Project " + response + " does not exist.");
+                            return;
+                        }
                         Task[] tasks = taskService.getProjectTasks(response);
                         System.out.println(displayProjectDetails(project, tasks));
                     }

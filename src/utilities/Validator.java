@@ -165,7 +165,7 @@ public class Validator {
     }
     public static String getValidEmail() {
         while (true) {
-            String response = input.nextLine().trim().toLowerCase();
+            String response = input.nextLine().trim();
             if (response.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")) {
                 return response;
             } else {
