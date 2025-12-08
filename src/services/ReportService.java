@@ -4,7 +4,7 @@ import interfaces.Completable;
 import models.Projects.Project;
 import models.StatusReport;
 import models.Task;
-import services.exceptions.EmptyProjectException;
+import utilities.exceptions.EmptyProjectException;
 import utilities.KArray;
 
 public class ReportService {

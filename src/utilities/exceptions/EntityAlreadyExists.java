@@ -1,4 +1,4 @@
-package services.exceptions;
+package utilities.exceptions;
 
 public class EntityAlreadyExists extends RuntimeException {
     public EntityAlreadyExists(String message) {

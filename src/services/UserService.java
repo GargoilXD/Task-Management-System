@@ -1,13 +1,13 @@
 package services;
 
 import models.Users.User;
-import services.exceptions.EntityAlreadyExists;
+import utilities.exceptions.EntityAlreadyExists;
 import utilities.KArray;
 
 import java.util.NoSuchElementException;
 
 public class UserService {
-    KArray<User> users = new KArray<User>(User.class);
+    KArray<User> users = new KArray<>(User.class);
     public User currentUser;
 
     public UserService(User[] users) {

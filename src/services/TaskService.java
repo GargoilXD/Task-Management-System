@@ -2,13 +2,13 @@ package services;
 
 import interfaces.Completable;
 import models.Task;
-import services.exceptions.EntityAlreadyExists;
+import utilities.exceptions.EntityAlreadyExists;
 import utilities.KArray;
 
 import java.util.NoSuchElementException;
 
 public class TaskService {
-    KArray<Task> tasks =  new KArray<Task>(Task.class);
+    KArray<Task> tasks = new KArray<>(Task.class);
 
     public TaskService(Task[] tasks) {
         for (Task task : tasks) {
@@ -19,7 +19,7 @@ public class TaskService {
         return tasks.toArray();
     }
     public Task[] getProjectTasks(String ProjectID) {
-        KArray<Task> filteredTasks = new KArray<Task>(Task.class);
+        KArray<Task> filteredTasks = new KArray<>(Task.class);
         for (Task task : tasks.toArray()) {
             if (task.ProjectID.equals(ProjectID)) {
                 filteredTasks.add(task);

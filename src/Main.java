@@ -274,9 +274,17 @@ public class Main {
                     if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).Status != Completable.STATUS.COMPLETED) {
                         boolean assign = Validator.getValidChoice();
                         if (assign) {
-                            user.assign(assignedTask);
+                            if (user.isAssignedTask(assignedTask)) {
+                                System.err.println("Cannot assign an assigned task.");
+                            } else {
+                                user.assign(assignedTask);
+                            }
                         } else {
-                            user.unassign(assignedTask);
+                            if (!user.isAssignedTask(assignedTask)) {
+                                System.err.println("Cannot unassign an unassigned task.");
+                            } else {
+                                user.unassign(assignedTask);
+                            }
                         }
                     } else {
                         System.out.println("No Such Pending or Running Task found.");

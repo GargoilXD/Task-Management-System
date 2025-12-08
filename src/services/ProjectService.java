@@ -3,11 +3,9 @@ package services;
 import models.Projects.HardwareProject;
 import models.Projects.Project;
 import models.Projects.SoftwareProject;
-import services.exceptions.EntityAlreadyExists;
-import services.exceptions.EntityDoesNotExist;
+import utilities.exceptions.EntityAlreadyExists;
+import utilities.exceptions.EntityDoesNotExist;
 import utilities.KArray;
-
-import java.util.NoSuchElementException;
 
 public class ProjectService {
     // FatEnum
@@ -28,7 +26,7 @@ public class ProjectService {
             }
         }
     }
-    KArray<Project> projects =  new KArray<Project>(Project.class);
+    KArray<Project> projects = new KArray<>(Project.class);
 
     public ProjectService(Project[] projects) {
         for (Project project : projects) {
@@ -39,7 +37,7 @@ public class ProjectService {
         return projects.toArray();
     }
     public Project[] filterProjects(FILTER filter) {
-        KArray<Project> filteredProjects = new KArray<Project>(Project.class);
+        KArray<Project> filteredProjects = new KArray<>(Project.class);
         for (Project project : projects.toArray()) {
             switch (filter) {
                 case FILTER.ALL ignored:

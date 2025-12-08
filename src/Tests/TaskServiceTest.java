@@ -1,4 +1,4 @@
-package services.Tests;
+package Tests;
 
 import interfaces.Completable;
 import models.Task;

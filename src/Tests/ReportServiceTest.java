@@ -1,4 +1,4 @@
-package services.Tests;
+package Tests;
 
 import interfaces.Completable;
 import models.Projects.HardwareProject;
@@ -64,11 +64,12 @@ class ReportServiceTest {
                 }
                 Tasks += 1;
             }
-            AverageCompletion += (CompletedTasks / ((double) Tasks)) * 100;
+            double progress = ((double) CompletedTasks / (double) Tasks) * 100;
+            AverageCompletion += progress;
             assertEquals(CompletedTasks, report.CompletedTasks);
             assertEquals(UnCompletedTasks, report.UnCompletedTasks);
             assertEquals(Tasks, report.Tasks);
-            assertEquals((CompletedTasks / ((double) Tasks)) * 100, report.Progress);
+            assertEquals(progress, report.Progress);
         }
         AverageCompletion /= reportService.reports.size;
         assertEquals(AverageCompletion, reportService.AverageCompletion);

@@ -13,12 +13,6 @@ public class KArray<T> {
     public KArray(Class<T> genericClass) {
         this.genericClass = genericClass;
     }
-    public KArray(T[] elements, Class<T> genericClass) {
-        this.genericClass = genericClass;
-        for (T element : elements) {
-            add(element);
-        }
-    }
     @SuppressWarnings("unchecked")
     T[] newArray(int size) {
         return (T[]) Array.newInstance(genericClass, size);
@@ -28,6 +22,8 @@ public class KArray<T> {
         System.arraycopy(elements, 0, extended, 0, size);
         elements = extended;
     }
+    /*
+    Not currently used
     public void set(int index, T element) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
@@ -40,14 +36,6 @@ public class KArray<T> {
         }
         return elements[index];
     }
-    public int findIndex(T element) {
-        for (int index = 0; index < size; index++) {
-            if (elements[index].equals(element)) {
-                return index;
-            }
-        }
-        return -1;
-    }
     public T findElement(T element) {
         for (int index = 0; index < size; index++) {
             if (elements[index].equals(element)) {
@@ -55,6 +43,31 @@ public class KArray<T> {
             }
         }
         return null;
+    }
+    public void removeIndex(int index) {
+        if (index < 0 || index >= size) throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
+        elements[index] = null;
+        for (; index < size; index++) {
+            if (elements[index] == null) {
+                if ((index + 1) < size) {
+                    elements[index] = elements[index + 1];
+                    elements[index + 1] = null;
+                }
+            }
+        }
+        size--;
+    }
+    public boolean isEmpty() {
+        return size == 0;
+    }
+    */
+    public int findIndex(T element) {
+        for (int index = 0; index < size; index++) {
+            if (elements[index].equals(element)) {
+                return index;
+            }
+        }
+        return -1;
     }
     public boolean contains(T element) {
         for (int index = 0; index < size; index++) {
@@ -76,19 +89,6 @@ public class KArray<T> {
         if (size == elements.length) extend();
         elements[size++] = element;
     }
-    public void removeIndex(int index) {
-        if (index < 0 || index >= size) throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
-        elements[index] = null;
-        for (; index < size; index++) {
-            if (elements[index] == null) {
-                if ((index + 1) < size) {
-                    elements[index] = elements[index + 1];
-                    elements[index + 1] = null;
-                }
-            }
-        }
-        size--;
-    }
     public void removeElement(T element) {
         int index = findIndex(element);
         if (index == -1) throw new NoSuchElementException("");
@@ -105,9 +105,6 @@ public class KArray<T> {
     }
     public void clear() {
         size = 0;
-    }
-    public boolean isEmpty() {
-        return size == 0;
     }
     public T[] toArray() {
         T[] array = newArray(size);

@@ -1,4 +1,4 @@
-package services.Tests;
+package Tests;
 
 import models.Projects.HardwareProject;
 import models.Projects.Project;

@@ -1,4 +1,4 @@
-package services.Tests;
+package Tests;
 
 import models.Users.AdminUser;
 import models.Users.RegularUser;
@@ -21,9 +21,11 @@ class UserServiceTest {
                 }
         );
     }
+    @Test
     public void findUserByID() {
         Assertions.assertNotNull(userService.findUserByName("Kobby"));
     }
+    @Test
     public void findUserByName() {
         Assertions.assertNotNull(userService.findUserByID("U001"));
     }
