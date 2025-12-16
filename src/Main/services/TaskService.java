@@ -1,10 +1,10 @@
-package services;
+package Main.services;
 
-import interfaces.Completable;
-import models.Task;
-import utilities.exceptions.EntityAlreadyExists;
-import utilities.exceptions.EntityDoesNotExist;
-import utilities.KArray;
+import Main.interfaces.Completable;
+import Main.models.Task;
+import Main.utilities.exceptions.EntityAlreadyExists;
+import Main.utilities.exceptions.EntityDoesNotExist;
+import Main.utilities.KArray;
 
 public class TaskService {
     KArray<Task> tasks = new KArray<>(Task.class);

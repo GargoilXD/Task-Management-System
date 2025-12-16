@@ -1,4 +1,4 @@
-package models.Users;
+package Main.models.Users;
 
 // This is the User Class
 public abstract class User {

@@ -1,6 +1,6 @@
-package utilities.ConsoleMenu;
+package Main.utilities.ConsoleMenu;
 
-import utilities.Validator;
+import Main.utilities.Validator;
 
 public class OptionMenu extends ConsoleMenu {
     final String optionsTitle;

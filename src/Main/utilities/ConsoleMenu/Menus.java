@@ -1,74 +1,27 @@
-import interfaces.Completable;
-import models.Projects.*;
-import models.StatusReport;
-import models.Task;
-import models.Users.*;
-import services.ProjectService;
-import services.ReportService;
-import services.TaskService;
-import services.UserService;
-import utilities.ConsoleMenu.*;
-import utilities.Validator;
-import utilities.exceptions.EntityAlreadyExists;
-import utilities.exceptions.EntityDoesNotExist;
+package Main.utilities.ConsoleMenu;
 
-import java.util.Scanner;
+import Main.interfaces.Completable;
+import Main.models.Projects.Project;
+import Main.models.Projects.SoftwareProject;
+import Main.models.StatusReport;
+import Main.models.Task;
+import Main.models.Users.AdminUser;
+import Main.models.Users.RegularUser;
+import Main.models.Users.User;
+import Main.services.ProjectService;
+import Main.services.ReportService;
+import Main.services.TaskService;
+import Main.services.UserService;
+import Main.utilities.Validator;
+import Main.utilities.exceptions.EntityAlreadyExists;
+import Main.utilities.exceptions.EntityDoesNotExist;
 
-public class Main {
-    static UserService userService;
-    static ProjectService projectService;
-    static TaskService taskService;
-    static ReportService reportService;
-    static void initialize() {
-        userService = new UserService(
-                new User[] {
-                        new AdminUser("Kobby", "12345"),
-                        new AdminUser("Ama", "12345"),
-                        new RegularUser("Kofi", "12345", new String[] {"T001", "T002", "T003"})
-                }
-        );
-        projectService = new ProjectService(
-                new Project[] {
-                        new SoftwareProject("Alpha Tracker", "Task tracking app for startups", 5, 15000),
-                        new HardwareProject("IoT Sensor Kit", "Sensor prototype for smart devices", 3, 1000),
-                        new SoftwareProject("Cloud Backup Tool", "Automated backup solution for SMBs", 4, 12000),
-                        new HardwareProject("Smart Thermostat", "Energy-efficient home climate control", 6, 2500),
-                        new SoftwareProject("HR Onboarding Portal", "Streamlined employee onboarding system", 6, 18000),
-                        new SoftwareProject("EduQuiz Platform", "Interactive quiz app for educators", 4, 9500),
-                        new HardwareProject("Solar-Powered Charger", "Portable charger using renewable energy", 5, 1800),
-                });
-        taskService = new TaskService(
-                new Task[] {
-                        new Task("P001", "Design Database", Task.STATUS.COMPLETED),
-                        new Task("P001", "Implement API", Task.STATUS.IN_PROGRESS),
-                        new Task("P001", "Write Unit Tests", Task.STATUS.PENDING),
-                        new Task("P002", "Gather Materials", Task.STATUS.COMPLETED),
-                        new Task("P002", "Build prototype", Task.STATUS.IN_PROGRESS),
-                        new Task("P003", "Define Backup Strategy", Task.STATUS.COMPLETED),
-                        new Task("P003", "Develop Sync Engine", Task.STATUS.IN_PROGRESS),
-                        new Task("P003", "Create UI Dashboard", Task.STATUS.PENDING),
-                        new Task("P004", "Circuit Design", Task.STATUS.COMPLETED),
-                        new Task("P004", "Firmware Development", Task.STATUS.IN_PROGRESS),
-                        new Task("P004", "Enclosure Prototyping", Task.STATUS.PENDING),
-                        new Task("P005", "User Authentication", Task.STATUS.COMPLETED),
-                        new Task("P005", "Document Upload Module", Task.STATUS.IN_PROGRESS),
-                        new Task("P005", "Integration with Payroll", Task.STATUS.PENDING),
-                        new Task("P006", "User Registration Flow", Task.STATUS.COMPLETED),
-                        new Task("P006", "Quiz Builder UI", Task.STATUS.IN_PROGRESS),
-                        new Task("P006", "Real-time Grading Engine", Task.STATUS.PENDING),
-                        new Task("P007", "Solar Panel Sourcing", Task.STATUS.COMPLETED),
-                        new Task("P007", "Battery Integration", Task.STATUS.COMPLETED),
-                        new Task("P007", "Safety & Overcharge Protection", Task.STATUS.IN_PROGRESS),
-                });
-        reportService = new ReportService(projectService, taskService);
-        Validator.input = new Scanner(System.in);
-    }
-    public static void main(String[] args) {
-        initialize();
-        getLoginMenu().asRoot().display();
-        Validator.input.close();
-    }
-    static ConsoleMenu getLoginMenu() {
+public class Menus {
+    public static UserService userService;
+    public static ProjectService projectService;
+    public static TaskService taskService;
+    public static ReportService reportService;
+    public static ConsoleMenu getLoginMenu() {
         return new DynamicMenu(
                 "Login",
                 """
@@ -104,9 +57,9 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getMainMenu() {
+    public static ConsoleMenu getMainMenu() {
         return new OptionMenu(
-                "Main Menu",
+                "Main.Main Menu",
                 """
                     =====================================
                     JAVA PROJECT MANAGEMENT SYSTEM (JPMS)
@@ -115,7 +68,7 @@ public class Main {
                 String.format("""
                 Current User: %s %s
                 
-                Main Menu
+                Main.Main Menu
                 ---------""", userService.currentUser.Name, (userService.currentUser instanceof AdminUser ? "(Admin)" : "")),
                 // Role based Access
                 // Admins can: ManageProjects, ManageTasks, ViewStatusReports, ManageUsers and SwitchUsers
@@ -138,7 +91,7 @@ public class Main {
                 "Enter your choice:"
         );
     }
-    static String displayProjectDetails(Project project, Task[] tasks) {
+    public static String displayProjectDetails(Project project, Task[] tasks) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format(
                 """
@@ -148,7 +101,7 @@ public class Main {
                     Budget: %s
                     """,
                 project.Name,
-                project instanceof SoftwareProject? "Software" : "Hardware",
+                project instanceof SoftwareProject ? "Software" : "Hardware",
                 project.TeamSize,
                 project.Budget
         ));
@@ -174,7 +127,7 @@ public class Main {
         builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
         return builder.toString();
     }
-    static ConsoleMenu getManageUsersMenu() {
+    public static ConsoleMenu getManageUsersMenu() {
         return new OptionMenu(
                 "Manage Users",
                 """
@@ -192,7 +145,7 @@ public class Main {
                 "Enter your choice"
         );
     }
-    static ConsoleMenu getCreateUserMenu() {
+    public static ConsoleMenu getCreateUserMenu() {
         return new DynamicMenu(
                 "Create User",
                 """
@@ -218,7 +171,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getAssignUserTasksMenu() {
+    public static ConsoleMenu getAssignUserTasksMenu() {
         return new DynamicMenu(
                 "Assign User Tasks",
                 """
@@ -302,7 +255,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getProjectDetailsMenu(Project project, Task[] tasks) {
+    public static ConsoleMenu getProjectDetailsMenu(Project project, Task[] tasks) {
         return new OptionMenu(
                 "Project Details",
                 """
@@ -322,7 +275,7 @@ public class Main {
                 "Enter your choice:"
         );
     }
-    static ConsoleMenu getAddTaskMenu(String defaultProjectID) {
+    public static ConsoleMenu getAddTaskMenu(String defaultProjectID) {
         return new DynamicMenu(
                 "Add New Task",
                 """
@@ -355,7 +308,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getUpdateTaskMenu() {
+    public static ConsoleMenu getUpdateTaskMenu() {
         return new DynamicMenu(
                 "Update Task Status",
                 """
@@ -377,7 +330,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getDeleteTaskMenu() {
+    public static ConsoleMenu getDeleteTaskMenu() {
         return new DynamicMenu(
                 "Remove Task",
                 """
@@ -398,7 +351,7 @@ public class Main {
         );
     }
     // Note: doesn't return a menu. It's specifically for the getBrowseProjectsMenu DynamicMenus
-    static void projectFilterProcess(ProjectService.FILTER filter) {
+    public static void projectFilterProcess(ProjectService.FILTER filter) {
         Project[] projects;
         // If the filter is for BUDGET then we ask for the range
         if (filter instanceof ProjectService.FILTER.BUDGET) {
@@ -440,7 +393,7 @@ public class Main {
             getProjectDetailsMenu(project, tasks).display();
         }
     }
-    static ConsoleMenu getBrowseProjectsMenu() {
+    public static ConsoleMenu getBrowseProjectsMenu() {
         return new OptionMenu(
                 "Browse Projects",
                 """
@@ -459,7 +412,7 @@ public class Main {
                 "Enter filter choice:"
         );
     }
-    static ConsoleMenu getCreateProjectMenu() {
+    public static ConsoleMenu getCreateProjectMenu() {
         return new DynamicMenu(
                 "Create Project",
                 """
@@ -487,7 +440,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getDeleteProjectMenu() {
+    public static ConsoleMenu getDeleteProjectMenu() {
         return new DynamicMenu(
                 "Remove Project",
                 """
@@ -507,7 +460,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getManageProjectMenu() {
+    public static ConsoleMenu getManageProjectMenu() {
         return new OptionMenu(
                 "Manage Projects",
                 """
@@ -529,7 +482,7 @@ public class Main {
                 "Enter your choice:"
         );
     }
-    static ConsoleMenu getManageTaskMenu() {
+    public static ConsoleMenu getManageTaskMenu() {
         return new OptionMenu(
                 "Manage Tasks",
                 """
@@ -548,7 +501,7 @@ public class Main {
                 "Enter your choice:"
         );
     }
-    static ConsoleMenu getViewTasksForProjectMenu() {
+    public static ConsoleMenu getViewTasksForProjectMenu() {
         return new DynamicMenu(
                 "View Tasks For Project",
                 """
@@ -573,7 +526,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getViewStatusReportMenu() {
+    public static ConsoleMenu getViewStatusReportMenu() {
         return new DynamicMenu(
                 "View Status Reports",
                 """
@@ -597,7 +550,7 @@ public class Main {
                 }
         );
     }
-    static ConsoleMenu getSwitchUserMenu() {
+    public static ConsoleMenu getSwitchUserMenu() {
         ConsoleMenu switchUserMenu = new DynamicMenu("Switch User", "", () -> {});
         switchUserMenu.goToRoot = true;
         return switchUserMenu;

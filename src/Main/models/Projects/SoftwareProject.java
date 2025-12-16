@@ -1,4 +1,4 @@
-package models.Projects;
+package Main.models.Projects;
 
 // This is the SoftwareProject class
 public class SoftwareProject extends Project {

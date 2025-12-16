@@ -1,4 +1,4 @@
-package models.Projects;
+package Main.models.Projects;
 
 // This is the HardwareProject class
 public class HardwareProject  extends Project {

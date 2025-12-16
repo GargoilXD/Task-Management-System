@@ -1,4 +1,4 @@
-package models.Projects;
+package Main.models.Projects;
 
 public abstract class Project {
     public String ID;

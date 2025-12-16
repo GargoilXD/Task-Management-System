@@ -1,6 +1,6 @@
-package utilities;
+package Main.utilities;
 
-import interfaces.Completable;
+import Main.interfaces.Completable;
 
 import java.util.Scanner;
 import java.util.function.Function;

@@ -1,4 +1,4 @@
-package interfaces;
+package Main.interfaces;
 
 // This is Completable interface that Task implements
 public interface Completable {

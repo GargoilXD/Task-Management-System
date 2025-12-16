@@ -1,4 +1,4 @@
-package utilities.ConsoleMenu;
+package Main.utilities.ConsoleMenu;
 
 public abstract class ConsoleMenu {
     public String name;

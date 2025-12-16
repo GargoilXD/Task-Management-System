@@ -1,4 +1,4 @@
-package utilities.ConsoleMenu;
+package Main.utilities.ConsoleMenu;
 
 public class DynamicMenu extends ConsoleMenu {
     Runnable runnable;

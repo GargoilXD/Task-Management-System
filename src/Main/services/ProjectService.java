@@ -1,11 +1,11 @@
-package services;
+package Main.services;
 
-import models.Projects.HardwareProject;
-import models.Projects.Project;
-import models.Projects.SoftwareProject;
-import utilities.exceptions.EntityAlreadyExists;
-import utilities.exceptions.EntityDoesNotExist;
-import utilities.KArray;
+import Main.models.Projects.HardwareProject;
+import Main.models.Projects.Project;
+import Main.models.Projects.SoftwareProject;
+import Main.utilities.exceptions.EntityAlreadyExists;
+import Main.utilities.exceptions.EntityDoesNotExist;
+import Main.utilities.KArray;
 
 public class ProjectService {
     // FatEnum

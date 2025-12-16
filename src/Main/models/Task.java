@@ -1,6 +1,6 @@
-package models;
+package Main.models;
 
-import interfaces.Completable;
+import Main.interfaces.Completable;
 
 // This is the User Class
 public class Task implements Completable {

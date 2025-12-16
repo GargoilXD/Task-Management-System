@@ -1,15 +1,15 @@
 package Tests;
 
-import interfaces.Completable;
-import models.Projects.HardwareProject;
-import models.Projects.Project;
-import models.Projects.SoftwareProject;
-import models.StatusReport;
-import models.Task;
+import Main.interfaces.Completable;
+import Main.models.Projects.HardwareProject;
+import Main.models.Projects.Project;
+import Main.models.Projects.SoftwareProject;
+import Main.models.StatusReport;
+import Main.models.Task;
 import org.junit.jupiter.api.Test;
-import services.ProjectService;
-import services.ReportService;
-import services.TaskService;
+import Main.services.ProjectService;
+import Main.services.ReportService;
+import Main.services.TaskService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

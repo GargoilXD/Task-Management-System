@@ -1,14 +1,14 @@
-package services;
+package Main.services;
 
-import interfaces.Completable;
-import models.Projects.Project;
-import models.StatusReport;
-import models.Task;
-import utilities.exceptions.EmptyProjectException;
-import utilities.KArray;
+import Main.interfaces.Completable;
+import Main.models.Projects.Project;
+import Main.models.StatusReport;
+import Main.models.Task;
+import Main.utilities.exceptions.EmptyProjectException;
+import Main.utilities.KArray;
 
 public class ReportService {
-    public KArray<StatusReport> reports = new KArray<StatusReport>(StatusReport.class);
+    public KArray<StatusReport> reports = new KArray<>(StatusReport.class);
     public double AverageCompletion = 0;
     ProjectService projectService;
     TaskService taskService;

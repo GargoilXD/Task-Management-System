@@ -1,6 +1,6 @@
-package models.Users;
+package Main.models.Users;
 
-import utilities.KArray;
+import Main.utilities.KArray;
 
 // This is the class for RegularUsers
 public class RegularUser extends User {

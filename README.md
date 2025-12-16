@@ -26,25 +26,25 @@ The Task Management System (TMS) is a Java-based application designed to help us
    ```
 3. Build the project using Java:
    ```
-   javac Main.java
+   javac Main.Main.java
    ```
 
 ### Running the Application
 To run the application, execute the following command:
 ```
-java Main
+java Main.Main
 ```
 
 ## Usage Instructions for Task Management System
 
 ## Getting Started
 1. **Run the Application**:
-    - Compile and run the `Main.java` file. This will start the application and display the login menu.
+    - Compile and run the `Main.Main.java` file. This will start the application and display the login menu.
 
 2. **Login**:
     - Enter your username and password to log in. If you are an admin user, you will have additional privileges.
 
-## Main Features
+## Main.Main Features
 ### User Management
 - **Create User**: Admin users can create new users (both admin and regular).
 - **Assign Tasks**: Admin users can assign tasks to regular users.

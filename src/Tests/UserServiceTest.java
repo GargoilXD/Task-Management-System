@@ -1,12 +1,12 @@
 package Tests;
 
-import models.Users.AdminUser;
-import models.Users.RegularUser;
-import models.Users.User;
+import Main.models.Users.AdminUser;
+import Main.models.Users.RegularUser;
+import Main.models.Users.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import services.UserService;
+import Main.services.UserService;
 
 class UserServiceTest {
     static UserService userService;

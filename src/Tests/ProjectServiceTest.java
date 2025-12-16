@@ -1,10 +1,10 @@
 package Tests;
 
-import models.Projects.HardwareProject;
-import models.Projects.Project;
-import models.Projects.SoftwareProject;
+import Main.models.Projects.HardwareProject;
+import Main.models.Projects.Project;
+import Main.models.Projects.SoftwareProject;
 import org.junit.jupiter.api.*;
-import services.ProjectService;
+import Main.services.ProjectService;
 
 class ProjectServiceTest {
     static ProjectService projectService;

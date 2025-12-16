@@ -1,4 +1,4 @@
-package models;
+package Main.models;
 
 public class StatusReport {
     public String ProjectID;

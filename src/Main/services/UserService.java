@@ -1,8 +1,8 @@
-package services;
+package Main.services;
 
-import models.Users.User;
-import utilities.exceptions.EntityAlreadyExists;
-import utilities.KArray;
+import Main.models.Users.User;
+import Main.utilities.exceptions.EntityAlreadyExists;
+import Main.utilities.KArray;
 
 import java.util.NoSuchElementException;
 

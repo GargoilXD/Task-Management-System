@@ -1,11 +1,11 @@
 package Tests;
 
-import interfaces.Completable;
-import models.Task;
+import Main.interfaces.Completable;
+import Main.models.Task;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import services.TaskService;
+import Main.services.TaskService;
 
 class TaskServiceTest {
     static TaskService taskService;
