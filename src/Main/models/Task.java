@@ -18,4 +18,11 @@ public class Task implements Completable {
         this.Name = Name;
         this.Status = Status;
     }
+    public Task(String ID, String ProjectID, String Name, STATUS Status) {
+        this.ID = ID;
+        this.ProjectID = ProjectID;
+        this.Name = Name;
+        this.Status = Status;
+        LastID++;
+    }
 }

@@ -1,5 +1,6 @@
 package Main.utilities.ConsoleMenu;
 
+import Main.Main;
 import Main.interfaces.Completable;
 import Main.models.Projects.Project;
 import Main.models.Projects.SoftwareProject;
@@ -9,18 +10,13 @@ import Main.models.Users.AdminUser;
 import Main.models.Users.RegularUser;
 import Main.models.Users.User;
 import Main.services.ProjectService;
-import Main.services.ReportService;
-import Main.services.TaskService;
-import Main.services.UserService;
 import Main.utilities.Validator;
 import Main.utilities.exceptions.EntityAlreadyExists;
 import Main.utilities.exceptions.EntityDoesNotExist;
 
+import java.util.ArrayList;
+
 public class Menus {
-    public static UserService userService;
-    public static ProjectService projectService;
-    public static TaskService taskService;
-    public static ReportService reportService;
     public static ConsoleMenu getLoginMenu() {
         return new DynamicMenu(
                 "Login",
@@ -41,7 +37,7 @@ public class Menus {
                         username = Validator.input.nextLine();
                         System.out.println("Enter Password: ");
                         password = Validator.input.nextLine();
-                        if (userService.validateCredentials(username, password)) {
+                        if (Main.userService.validateCredentials(username, password)) {
                             ConsoleMenu mainMenu = getMainMenu();
                             mainMenu.display();
                             if (mainMenu.goToRoot) {
@@ -69,11 +65,11 @@ public class Menus {
                 Current User: %s %s
                 
                 Main.Main Menu
-                ---------""", userService.currentUser.Name, (userService.currentUser instanceof AdminUser ? "(Admin)" : "")),
+                ---------""", Main.userService.currentUser.Name, (Main.userService.currentUser instanceof AdminUser ? "(Admin)" : "")),
                 // Role based Access
                 // Admins can: ManageProjects, ManageTasks, ViewStatusReports, ManageUsers and SwitchUsers
                 // RegularUsers can: ManageProjects, ManageTasks, ViewStatusReports and SwitchUsers
-                (userService.currentUser instanceof AdminUser)?
+                (Main.userService.currentUser instanceof AdminUser)?
                         new ConsoleMenu[] {
                                 getManageProjectMenu(),
                                 getManageTaskMenu(),
@@ -91,7 +87,7 @@ public class Menus {
                 "Enter your choice:"
         );
     }
-    public static String displayProjectDetails(Project project, Task[] tasks) {
+    public static String displayProjectDetails(Project project, ArrayList<Task> tasks) {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format(
                 """
@@ -123,7 +119,7 @@ public class Menus {
                 completionRate += 1;
             }
         }
-        completionRate /= tasks.length > 0 ? tasks.length : 1;
+        completionRate /= !tasks.isEmpty() ? tasks.size() : 1;
         builder.append(String.format("Completion Rate: %.2f", completionRate * 100)).append("%\n");
         return builder.toString();
     }
@@ -155,7 +151,7 @@ public class Menus {
                     """,
                 () -> {
                     System.out.println("Username: ");
-                    String username = Validator.manualValidation((input) -> userService.findUserByName(input) == null, "Username already taken");
+                    String username = Validator.manualValidation((input) -> Main.userService.findUserByName(input) == null, "Username already taken");
                     System.out.println("Password: ");
                     String password = Validator.input.nextLine();
                     System.out.println("Email: ");
@@ -163,7 +159,7 @@ public class Menus {
                     System.out.println("Is Admin? Y/N: ");
                     boolean isAdmin = Validator.getValidChoice();
                     try {
-                        userService.addUser(isAdmin? new AdminUser(username, password, email) : new RegularUser(username, password, email));
+                        Main.userService.addUser(isAdmin? new AdminUser(username, password, email) : new RegularUser(username, password, email));
                         System.out.println("User created!");
                     } catch (EntityAlreadyExists e) {
                         System.out.println(e.getMessage());
@@ -184,15 +180,15 @@ public class Menus {
                     System.out.println("-".repeat(80));
                     System.out.println("ID   | USERNAME       | EMAIL                          | TASKS ASSIGNED ");
                     System.out.println("-".repeat(80));
-                    for (User user: userService.getUsers()) {
-                        System.out.printf("%s | %-14s | %-30s | %s%n", user.ID, user.Name, user.Email, (user instanceof RegularUser)? ((RegularUser)(user)).assignedTasks.size : "ADMIN");
+                    for (User user: Main.userService.getUsers()) {
+                        System.out.printf("%s | %-14s | %-30s | %s%n", user.ID, user.Name, user.Email, (user instanceof RegularUser)? ((RegularUser)(user)).assignedTasks.size() : "ADMIN");
                     }
                     System.out.println("-".repeat(80));
                     System.out.println();
                     System.out.println("Enter User ID: ");
                     String userID = Validator.getValidUserID();
                     RegularUser user;
-                    switch (userService.findUserByID(userID)) {
+                    switch (Main.userService.findUserByID(userID)) {
                         case null -> {
                             System.err.println("User not found.");
                             System.out.println("Press enter to continue...");
@@ -210,7 +206,7 @@ public class Menus {
                             return;
                         }
                     }
-                    Task[] tasks = taskService.getTasks();
+                    ArrayList<Task> tasks = Main.taskService.getTasks();
                     System.out.println("Associated Tasks:");
                     System.out.println("-".repeat(80));
                     System.out.println("ID   | TASK NAME                      | STATUS          | ASSIGNED");
@@ -231,7 +227,7 @@ public class Menus {
                     System.out.println("-".repeat(80));
                     System.out.println("Enter the Task ID of the Task you want to assign or unassign:");
                     String assignedTask = Validator.getValidTaskID();
-                    if (taskService.findTaskByID(assignedTask) != null && taskService.findTaskByID(assignedTask).Status != Completable.STATUS.COMPLETED) {
+                    if (Main.taskService.findTaskByID(assignedTask) != null && Main.taskService.findTaskByID(assignedTask).Status != Completable.STATUS.COMPLETED) {
                         System.out.println("Enter y to assign and n to unassign:");
                         boolean assign = Validator.getValidChoice();
                         if (assign) {
@@ -255,7 +251,7 @@ public class Menus {
                 }
         );
     }
-    public static ConsoleMenu getProjectDetailsMenu(Project project, Task[] tasks) {
+    public static ConsoleMenu getProjectDetailsMenu(Project project, ArrayList<Task> tasks) {
         return new OptionMenu(
                 "Project Details",
                 """
@@ -285,7 +281,7 @@ public class Menus {
                     """,
                 () -> {
                     System.out.println("Enter task name:");
-                    String name = Validator.manualValidation((input) -> taskService.findTaskByName(input) == null, "Task name is already taken");
+                    String name = Validator.manualValidation((input) -> Main.taskService.findTaskByName(input) == null, "Task name is already taken");
                     String projectID;
                     if (defaultProjectID.isEmpty()) {
                         System.out.println("Enter assign project ID:");
@@ -300,7 +296,7 @@ public class Menus {
                     System.out.println("Enter initial status (Pending/In Progress/Completed):");
                     Completable.STATUS status = Validator.getValidTaskStatus();
                     try {
-                        taskService.createTask(projectID, name, status);
+                        Main.taskService.createTask(projectID, name, status);
                         System.out.println("Task Created!");
                     } catch (EntityAlreadyExists e) {
                         System.err.println(e.getMessage());
@@ -322,7 +318,7 @@ public class Menus {
                     System.out.println("Enter new status (Pending/In Progress/Completed):");
                     Completable.STATUS status = Validator.getValidTaskStatus();
                     try {
-                        taskService.updateTask(taskID, status);
+                        Main.taskService.updateTask(taskID, status);
                         System.out.println("Task updated successfully.");
                     } catch (EntityAlreadyExists e) {
                         System.err.println(e.getMessage());
@@ -342,7 +338,7 @@ public class Menus {
                     System.out.println("Enter task ID:");
                     String taskID = Validator.getValidTaskID();
                     try {
-                        taskService.removeTask(taskID);
+                        Main.taskService.removeTask(taskID);
                         System.out.println("Task removed successfully.");
                     } catch (EntityDoesNotExist e) {
                         System.err.println(e.getMessage());
@@ -352,7 +348,7 @@ public class Menus {
     }
     // Note: doesn't return a menu. It's specifically for the getBrowseProjectsMenu DynamicMenus
     public static void projectFilterProcess(ProjectService.FILTER filter) {
-        Project[] projects;
+        ArrayList<Project> projects;
         // If the filter is for BUDGET then we ask for the range
         if (filter instanceof ProjectService.FILTER.BUDGET) {
             int min;
@@ -372,7 +368,7 @@ public class Menus {
             // Update the range for the FatEnum
             filter = new ProjectService.FILTER.BUDGET(min, max);
         }
-        projects = projectService.filterProjects(filter);
+        projects = Main.projectService.filterProjects(filter);
         System.out.println("-".repeat(80));
         System.out.println("ID   | PROJECT NAME                             | TYPE       | TEAM SIZE | BUDGET");
         System.out.println("-".repeat(80));
@@ -384,12 +380,12 @@ public class Menus {
         System.out.println("Enter project ID to view details (0 to return):");
         String response = Validator.getValidProjectID("0");
         if (!response.equals("0")) {
-            Project project = projectService.findProjectByID(response);
+            Project project = Main.projectService.findProjectByID(response);
             if (project == null) {
                 System.err.println("Project " + response + " not found.");
                 return;
             }
-            Task[] tasks = taskService.getProjectTasks(response);
+            ArrayList<Task> tasks = Main.taskService.getProjectTasks(response);
             getProjectDetailsMenu(project, tasks).display();
         }
     }
@@ -422,7 +418,7 @@ public class Menus {
                         """,
                 () -> {
                     System.out.println("Enter project name:");
-                    String name = Validator.manualValidation((input) -> projectService.findProjectByName(input) == null, "Project name is already taken");
+                    String name = Validator.manualValidation((input) -> Main.projectService.findProjectByName(input) == null, "Project name is already taken");
                     System.out.println("Enter project type:");
                     boolean isSoftware = Validator.getValidProjectType();
                     System.out.println("Enter project description:");
@@ -432,7 +428,7 @@ public class Menus {
                     System.out.println("Enter budget:");
                     double budget = Validator.getValidNumber(0);
                     try {
-                        projectService.createProject(name, description, teamSize, budget, isSoftware);
+                        Main.projectService.createProject(name, description, teamSize, budget, isSoftware);
                         System.out.println("Project created successfully.");
                     } catch (Exception e) {
                         System.err.println(e.getMessage());
@@ -450,9 +446,9 @@ public class Menus {
                         """,
                 () -> {
                     System.out.println("Enter Project ID:");
-                    String projectID = Validator.manualValidation((input) -> projectService.findProjectByID(input) != null, "Project does not exist");
+                    String projectID = Validator.manualValidation((input) -> Main.projectService.findProjectByID(input) != null, "Project does not exist");
                     try {
-                        projectService.removeProject(projectID);
+                        Main.projectService.removeProject(projectID);
                         System.out.println("Project " + projectID + " has been removed.");
                     } catch (EntityDoesNotExist e) {
                         System.err.println(e.getMessage());
@@ -469,7 +465,7 @@ public class Menus {
                         ==============================
                         """,
                 "Options:",
-                (userService.currentUser instanceof AdminUser)
+                (Main.userService.currentUser instanceof AdminUser)
                         ? new ConsoleMenu[] {
                         getCreateProjectMenu(),
                         getDeleteProjectMenu(),
@@ -513,12 +509,12 @@ public class Menus {
                     System.out.println("Enter project ID to view details (0 to return):");
                     String response = Validator.getValidProjectID("0");
                     if (!response.equals("0")) {
-                        Project project = projectService.findProjectByID(response);
+                        Project project = Main.projectService.findProjectByID(response);
                         if (project == null) {
                             System.err.println("Project " + response + " does not exist.");
                             return;
                         }
-                        Task[] tasks = taskService.getProjectTasks(response);
+                        ArrayList<Task> tasks = Main.taskService.getProjectTasks(response);
                         System.out.println(displayProjectDetails(project, tasks));
                     }
                     System.out.println("Press enter to continue...");
@@ -535,15 +531,15 @@ public class Menus {
                     ==============================
                     """,
                 () -> {
-                    reportService.updateReports();
+                    Main.reportService.updateReports();
                     System.out.println("-".repeat(80));
                     System.out.println("PROJECT ID | PROJECT NAME                   | TASKS | COMPLETED | PROGRESS (%)");
                     System.out.println("-".repeat(80));
-                    for (StatusReport report : reportService.reports.toArray()) {
+                    for (StatusReport report : Main.reportService.reports.toArray()) {
                         System.out.println(String.format("%-10s | %-30s | %-5s | %-9s | %.2f", report.ProjectID, report.ProjectName, report.Tasks, report.CompletedTasks, report.Progress) + "%");
                     }
                     System.out.println("-".repeat(80));
-                    System.out.printf("AVERAGE COMPLETION: %.2f%s%n", reportService.AverageCompletion, "%");
+                    System.out.printf("AVERAGE COMPLETION: %.2f%s%n", Main.reportService.AverageCompletion, "%");
                     System.out.println("-".repeat(80));
                     System.out.println("Press enter to continue...");
                     Validator.input.nextLine();

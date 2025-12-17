@@ -3,23 +3,18 @@ package Tests;
 import Main.models.Projects.HardwareProject;
 import Main.models.Projects.Project;
 import Main.models.Projects.SoftwareProject;
+import Main.utilities.FileUtilities;
+import Main.utilities.exceptions.EntityAlreadyExists;
+import Main.utilities.exceptions.EntityDoesNotExist;
 import org.junit.jupiter.api.*;
 import Main.services.ProjectService;
 
 class ProjectServiceTest {
     static ProjectService projectService;
+
     @BeforeAll
     static void setUp() {
-        projectService = new ProjectService(
-                new Project[] {
-                        new SoftwareProject("Alpha Tracker", "Task tracking app for startups", 5, 15000),
-                        new HardwareProject("IoT Sensor Kit", "Sensor prototype for smart devices", 3, 1000),
-                        new SoftwareProject("Cloud Backup Tool", "Automated backup solution for SMBs", 4, 12000),
-                        new HardwareProject("Smart Thermostat", "Energy-efficient home climate control", 6, 2500),
-                        new SoftwareProject("HR Onboarding Portal", "Streamlined employee onboarding system", 6, 18000),
-                        new SoftwareProject("EduQuiz Platform", "Interactive quiz app for educators", 4, 9500),
-                        new HardwareProject("Solar-Powered Charger", "Portable charger using renewable energy", 5, 1800),
-                });
+        projectService = new ProjectService(FileUtilities.loadProjects());
     }
 
     @Test
@@ -50,10 +45,24 @@ class ProjectServiceTest {
         projectService.createProject("The Marathon Project", "Running long distances", 67, 1000000, false);
         assert projectService.findProjectByName("The Marathon Project") != null;
     }
+    @Test
+    void createProjectAndCatchException() {
+        Assertions.assertThrows(EntityAlreadyExists.class, () -> {
+            projectService.createProject("The Jumping Project", "Running jumping distances", 67, 1000000, false);
+            projectService.createProject("The Jumping Project", "Running jumping distances", 67, 1000000, false);
+        });
+    }
 
     @Test
     void removeProject() {
         projectService.removeProject("P003");
         assert projectService.findProjectByID("P003") == null;
+    }
+    @Test
+    void removeProjectAndCatchException() {
+        Assertions.assertThrows(EntityDoesNotExist.class, () -> {
+            projectService.removeProject("P004");
+            projectService.removeProject("P004");
+        });
     }
 }

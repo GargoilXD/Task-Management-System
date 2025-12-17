@@ -17,4 +17,12 @@ public abstract class Project {
         this.TeamSize = TeamSize;
         this.Budget = Budget;
     }
+    public Project(String ID, String Name, String Description, int TeamSize, double Budget) {
+        this.ID = ID;
+        this.Name = Name;
+        this.Description = Description;
+        this.TeamSize = TeamSize;
+        this.Budget = Budget;
+        LastID++;
+    }
 }

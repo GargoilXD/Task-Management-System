@@ -1,25 +1,21 @@
 package Tests;
 
 import Main.models.Users.AdminUser;
-import Main.models.Users.RegularUser;
-import Main.models.Users.User;
+import Main.utilities.FileUtilities;
+import Main.utilities.exceptions.EntityAlreadyExists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import Main.services.UserService;
+
+import java.util.NoSuchElementException;
 
 class UserServiceTest {
     static UserService userService;
 
     @BeforeAll
     static void setUp() {
-        userService = new UserService(
-                new User[] {
-                        new AdminUser("Kobby", "12345"),
-                        new AdminUser("Ama", "12345"),
-                        new RegularUser("Kofi", "12345", new String[] {"T001", "T002", "T003"})
-                }
-        );
+        userService = new UserService(FileUtilities.loadUsers());
     }
     @Test
     public void findUserByID() {
@@ -29,10 +25,6 @@ class UserServiceTest {
     public void findUserByName() {
         Assertions.assertNotNull(userService.findUserByID("U001"));
     }
-    @Test
-    void getUsers() {
-        Assertions.assertEquals(3, userService.getUsers().length);
-    }
 
     @Test
     void addUser() {
@@ -41,8 +33,24 @@ class UserServiceTest {
     }
 
     @Test
+    void addUserAndCatchException() {
+        Assertions.assertThrows(EntityAlreadyExists.class, () -> {
+            userService.addUser(new AdminUser("Kwame", "12345"));
+            userService.addUser(new AdminUser("Kwame", "12345"));
+        });
+    }
+
+    @Test
     void removeUser() {
         userService.removeUser("U001");
         Assertions.assertNull(userService.findUserByID("U001"));
+    }
+
+    @Test
+    void removeUserAndCatchException() {
+        Assertions.assertThrows(NoSuchElementException.class, () -> {
+            userService.removeUser("U002");
+            userService.removeUser("U002");
+        });
     }
 }

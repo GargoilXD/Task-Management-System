@@ -2,27 +2,25 @@ package Main.services;
 
 import Main.models.Users.User;
 import Main.utilities.exceptions.EntityAlreadyExists;
-import Main.utilities.KArray;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 public class UserService {
-    KArray<User> users = new KArray<>(User.class);
+    ArrayList<User> users;
     public User currentUser;
 
-    public UserService(User[] users) {
-        for (User user : users) {
-            this.users.add(user);
-        }
+    public UserService(ArrayList<User> users) {
+        this.users = users;
     }
     public User findUserByID(String ID) {
-        return users.customFind((user) -> user.ID.equals(ID));
+        return users.stream().filter((user -> user.ID.equals(ID))).findFirst().orElse(null);
     }
     public User findUserByName(String Name) {
-        return users.customFind((user) -> user.Name.equalsIgnoreCase(Name));
+        return users.stream().filter((user -> user.Name.equalsIgnoreCase(Name))).findFirst().orElse(null);
     }
-    public User[] getUsers() {
-        return users.toArray();
+    public ArrayList<User> getUsers() {
+        return users;
     }
     public void addUser(User user) {
         if (findUserByName(user.Name) != null) throw new EntityAlreadyExists("User already exists");
@@ -31,17 +29,15 @@ public class UserService {
     public void removeUser(String UserID) {
         User found = findUserByID(UserID);
         if (found == null) throw new NoSuchElementException("User with ID " + UserID + " does not exist");
-        users.removeElement(found);
+        users.remove(found);
     }
     public boolean validateCredentials(String username, String password) {
-        return users.customFind(
-            (user) -> {
-                if (user.Name.equals(username) && (user.Password.equals(password))) {
-                    currentUser = user;
-                    return true;
-                }
-                return false;
+        return users.stream().anyMatch((user -> {
+            if (user.Name.equals(username) && user.Password.equals(password)) {
+                currentUser = user;
+                return true;
             }
-        ) != null;
+            return false;
+        }));
     }
 }

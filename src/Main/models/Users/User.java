@@ -14,6 +14,7 @@ public abstract class User {
         LastID++;
         this.Name = Name;
         this.Password = Password;
+        this.Email = "";
     }
     public User(String Name, String Password, String Email) {
         this.ID = String.format("U%03d", LastID);
@@ -21,5 +22,12 @@ public abstract class User {
         this.Name = Name;
         this.Password = Password;
         this.Email = Email;
+    }
+    public User(String ID, String Name, String Password, String Email) {
+        this.ID = ID;
+        this.Name = Name;
+        this.Password = Password;
+        this.Email = Email;
+        LastID++;
     }
 }

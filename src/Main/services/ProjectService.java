@@ -5,7 +5,10 @@ import Main.models.Projects.Project;
 import Main.models.Projects.SoftwareProject;
 import Main.utilities.exceptions.EntityAlreadyExists;
 import Main.utilities.exceptions.EntityDoesNotExist;
-import Main.utilities.KArray;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class ProjectService {
     // FatEnum
@@ -26,55 +29,41 @@ public class ProjectService {
             }
         }
     }
-    KArray<Project> projects = new KArray<>(Project.class);
+    HashMap<String, Project> projects = new HashMap<>();
 
-    public ProjectService(Project[] projects) {
+    public ProjectService(ArrayList<Project> projects) {
         for (Project project : projects) {
-            this.projects.add(project);
+            this.projects.put(project.ID, project);
         }
     }
-    public Project[] getProjects() {
-        return projects.toArray();
+    public ArrayList<Project> getProjects() {
+        return new ArrayList<>(projects.values());
     }
-    public Project[] filterProjects(FILTER filter) {
-        KArray<Project> filteredProjects = new KArray<>(Project.class);
-        for (Project project : projects.toArray()) {
-            switch (filter) {
-                case FILTER.ALL ignored:
-                    filteredProjects.add(project);
-                    break;
-                case FILTER.SOFTWARE ignored:
-                    if (project instanceof SoftwareProject) filteredProjects.add(project);
-                    break;
-                case FILTER.HARDWARE ignored:
-                    if (project instanceof HardwareProject) filteredProjects.add(project);
-                    break;
-                case FILTER.BUDGET budget:
-                    if (project.Budget >= budget.min && project.Budget <= budget.max) filteredProjects.add(project);
-                    break;
-                default:
-                    throw new IllegalStateException("Unexpected value: " + filter);
-            }
-        }
-        return filteredProjects.toArray();
+    public ArrayList<Project> filterProjects(FILTER filter) {
+        return projects.values().stream().filter(project -> switch (filter) {
+            case FILTER.ALL ignored -> true;
+            case FILTER.SOFTWARE ignored -> (project instanceof SoftwareProject);
+            case FILTER.HARDWARE ignored -> (project instanceof HardwareProject);
+            case FILTER.BUDGET budget -> (project.Budget >= budget.min && project.Budget <= budget.max);
+            default -> throw new IllegalStateException("Unexpected value: " + filter);
+        }).collect(Collectors.toCollection(ArrayList::new));
     }
     public Project findProjectByID(String ID) {
-        return projects.customFind((project) -> project.ID.equals(ID));
+        return projects.get(ID);
     }
     public Project findProjectByName(String Name) {
-        return projects.customFind((project) -> project.Name.equalsIgnoreCase(Name));
+        for (Project project : projects.values()) {
+            if (project.Name.equalsIgnoreCase(Name)) return project;
+        }
+        return null;
     }
     public void createProject(String Name, String Description, int TeamSize, double Budget, boolean isSoftwareProject) {
         if (findProjectByName(Name) != null) throw new EntityAlreadyExists("Project already exists");
-        if (isSoftwareProject) {
-            projects.add(new SoftwareProject(Name, Description, TeamSize, Budget));
-        } else {
-            projects.add(new HardwareProject(Name, Description, TeamSize, Budget));
-        }
+        Project project = isSoftwareProject? new SoftwareProject(Name, Description, TeamSize, Budget) : new HardwareProject(Name, Description, TeamSize, Budget);
+        projects.put(project.ID, project);
     }
     public void removeProject(String ID) {
-        Project found = findProjectByID(ID);
-        if (found == null) throw new EntityDoesNotExist("Project with ID " + ID + " does not exist");
-        projects.removeElement(found);
+        if (!projects.containsKey(ID)) throw new EntityDoesNotExist("Project with ID " + ID + " does not exist");
+        projects.remove(ID);
     }
 }

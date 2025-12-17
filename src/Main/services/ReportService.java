@@ -7,6 +7,8 @@ import Main.models.Task;
 import Main.utilities.exceptions.EmptyProjectException;
 import Main.utilities.KArray;
 
+import java.util.ArrayList;
+
 public class ReportService {
     public KArray<StatusReport> reports = new KArray<>(StatusReport.class);
     public double AverageCompletion = 0;
@@ -19,8 +21,8 @@ public class ReportService {
     }
     StatusReport generateReport(String projectID, String projectName) {
         StatusReport newReport = new StatusReport(projectID, projectName, 0 ,0, 0, 0);
-        Task[] projectTasks = taskService.getProjectTasks(projectID);
-        if (projectTasks.length == 0) {
+        ArrayList<Task> projectTasks = taskService.getProjectTasks(projectID);
+        if (projectTasks.isEmpty()) {
             throw new EmptyProjectException("Error: No Tasks in project " + projectID);
         }
         for (Task task : projectTasks) {
