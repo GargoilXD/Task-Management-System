@@ -10,6 +10,7 @@ import Main.models.Users.RegularUser;
 import Main.models.Users.User;
 
 import Main.utilities.exceptions.FileLoadException;
+import Main.utilities.exceptions.FileSaveException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -71,7 +72,7 @@ public class FileUtilities {
         try {
             Files.writeString(ProjectDataPath, jsonArray.toJSONString());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileSaveException(e.getMessage());
         }
     }
     public static ArrayList<Task> loadTasks() throws FileLoadException {
@@ -113,7 +114,7 @@ public class FileUtilities {
         try {
             Files.writeString(TaskDataPath, jsonArray.toJSONString());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileSaveException(e.getMessage());
         }
     }
     public static ArrayList<User> loadUsers() throws FileLoadException {
@@ -167,7 +168,7 @@ public class FileUtilities {
         try {
             Files.writeString(UserDataPath, jsonArray.toJSONString());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileSaveException(e.getMessage());
         }
     }
 }

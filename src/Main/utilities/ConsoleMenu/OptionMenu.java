@@ -25,6 +25,7 @@ public class OptionMenu extends ConsoleMenu {
                 System.out.printf("%s. %s%n", index + 1, subMenus[index].name);
             }
             System.out.printf("%s. %s%n", index + 1, backTitle);
+            System.out.println(choiceMessage);
             int choice = Validator.getValidInteger(1, subMenus.length + 1) - 1;
             if (choice == index) {
                 return;
