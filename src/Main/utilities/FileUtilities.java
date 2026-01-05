@@ -53,7 +53,7 @@ public class FileUtilities {
             return projects;
         } catch (IOException e) {
             throw new FileLoadException("Error loading projects file!");
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new FileLoadException("Projects file corrupted!");
         }
     }
@@ -97,7 +97,7 @@ public class FileUtilities {
             return tasks;
         } catch (IOException e) {
             throw new FileLoadException("Error loading tasks file!");
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new FileLoadException("Tasks file corrupted!");
         }
     }
@@ -145,7 +145,7 @@ public class FileUtilities {
             return users;
         } catch (IOException e) {
             throw new FileLoadException("Error loading users file!");
-        } catch (ParseException e) {
+        } catch (Exception e) {
             throw new FileLoadException("Users file corrupted!");
         }
     }
